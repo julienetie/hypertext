@@ -1,0 +1,27 @@
+{
+  "name": "hypertext",
+  "version": "0.0.1",
+  "description": "Create [virtual-dom](https://github.com/Matt-Esch/virtual-dom)'s [virtual-hyperscript](https://github.com/Raynos/virtual-hyperscript) **VTrees** or **DOM elements** using **_hypertext_**",
+  "main": "playground.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "play": "./node_modules/.bin/wzrd  playground.js | ./node_modules/.bin/wtch | ./node_modules/.bin/garnish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/julienetie/hypertext.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/julienetie/hypertext/issues"
+  },
+  "homepage": "https://github.com/julienetie/hypertext#readme",
+  "devDependencies": {
+    "browserify": "^13.1.0",
+    "garnish": "^5.2.0",
+    "wtch": "^4.0.1",
+    "wzrd": "^1.4.0"
+  }
+}
