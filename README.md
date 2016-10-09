@@ -5,6 +5,7 @@ Create [virtual-dom](https://github.com/Matt-Esch/virtual-dom)'s [virtual-hypers
 
 ```php
 **ALPHA**
+  (Current Bug when using virtual-dom's createElement)
 ```
 
 
