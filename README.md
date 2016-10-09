@@ -4,16 +4,23 @@ Create [virtual-dom](https://github.com/Matt-Esch/virtual-dom)'s [virtual-hypers
 
 
 ```php
-**NOT YET IMPLEMENTED**
+**ALPHA**
 ```
 
 
 ## What you need to know:
 #### **1**) _hypertext_ requires ES6 or CJS
 
-&nbsp;&nbsp;&nbsp;&nbsp;<sup>You can immediately demo using **```npm run play```** tweak **```./playground.js```** then check port **`9966`**</sup>
+&nbsp;&nbsp;&nbsp;&nbsp;<sup>Demo using **```npm run play```** tweak **```./playground.js```** then check port **`9966`**</sup>
 
 &nbsp;&nbsp;&nbsp;&nbsp;<sup>To demo via ES5 use **```./dist/hypertext-not-for-production.min.js```** all tags will miserably be global.</sup>
+
+- &nbsp;&nbsp;&nbsp;&nbsp;<sup>```npm i --save hypertext``` : Install</sup>
+- &nbsp;&nbsp;&nbsp;&nbsp;<sup>```npm run play``` : Host playground.js on port 9966</sup>
+- &nbsp;&nbsp;&nbsp;&nbsp;<sup>```npm run build``` : Builds es6 & cjs</sup>
+- &nbsp;&nbsp;&nbsp;&nbsp;<sup>```npm run global``` : Builds not-for-production.min.js</sup>
+- &nbsp;&nbsp;&nbsp;&nbsp;<sup>```npm run all``` : Builds all</sup>
+- &nbsp;&nbsp;&nbsp;&nbsp;<sup>```npm run watch``` : Build and watch src</sup>
 
 #### **2**) Import as you need
 ```javascript 
