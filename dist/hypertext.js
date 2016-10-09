@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory() :
-  typeof define === 'function' && define.amd ? define(factory) :
-  (factory());
-}(this, (function () { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+  (factory((global.hypertext = global.hypertext || {})));
+}(this, (function (exports) { 'use strict';
 
 /*!
  * Cross-Browser Split 1.1.1
@@ -157,78 +157,166 @@ function EvStore(elem) {
     return hash;
 }
 
-var version = 2;
+/**
+ * Creates a unary function that invokes `func` with its argument transformed.
+ *
+ * @private
+ * @param {Function} func The function to wrap.
+ * @param {Function} transform The argument transform.
+ * @returns {Function} Returns the new function.
+ */
+function overArg(func, transform) {
+  return function (arg) {
+    return func(transform(arg));
+  };
+}
 
-var topLevel = typeof global !== 'undefined' ? global : typeof window !== 'undefined' ? window : {};
-// var minDoc = require('min-document');
+var getPrototype$2 = overArg(Object.getPrototypeOf, Object);
 
-if (typeof document !== 'undefined') {
-    // module.exports = document;
-} else {
-    var doccy = topLevel['__GLOBAL_DOCUMENT_CACHE@4'];
+/**
+ * Checks if `value` is object-like. A value is object-like if it's not `null`
+ * and has a `typeof` result of "object".
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+ * @example
+ *
+ * _.isObjectLike({});
+ * // => true
+ *
+ * _.isObjectLike([1, 2, 3]);
+ * // => true
+ *
+ * _.isObjectLike(_.noop);
+ * // => false
+ *
+ * _.isObjectLike(null);
+ * // => false
+ */
+function isObjectLike(value) {
+  return value != null && typeof value == 'object';
+}
 
-    if (!doccy) {
-        doccy = topLevel['__GLOBAL_DOCUMENT_CACHE@4']; //= minDoc;
+var objectTag = '[object Object]';
+
+/** Used for built-in method references. */
+var funcProto = Function.prototype;
+var objectProto = Object.prototype;
+
+/** Used to resolve the decompiled source of functions. */
+var funcToString = funcProto.toString;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
+/** Used to infer the `Object` constructor. */
+var objectCtorString = funcToString.call(Object);
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var objectToString = objectProto.toString;
+
+/**
+ * Checks if `value` is a plain object, that is, an object created by the
+ * `Object` constructor or one with a `[[Prototype]]` of `null`.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.8.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
+ * @example
+ *
+ * function Foo() {
+ *   this.a = 1;
+ * }
+ *
+ * _.isPlainObject(new Foo);
+ * // => false
+ *
+ * _.isPlainObject([1, 2, 3]);
+ * // => false
+ *
+ * _.isPlainObject({ 'x': 0, 'y': 0 });
+ * // => true
+ *
+ * _.isPlainObject(Object.create(null));
+ * // => true
+ */
+function isPlainObject(value) {
+  if (!isObjectLike(value) || objectToString.call(value) != objectTag) {
+    return false;
+  }
+  var proto = getPrototype$2(value);
+  if (proto === null) {
+    return true;
+  }
+  var Ctor = hasOwnProperty.call(proto, 'constructor') && proto.constructor;
+  return typeof Ctor == 'function' && Ctor instanceof Ctor && funcToString.call(Ctor) == objectCtorString;
+}
+
+var version$1 = 2;
+
+function handleThunk$1(a, b) {
+    var renderedA = a;
+    var renderedB = b;
+
+    if (isThunk$1(b)) {
+        renderedB = renderThunk(b, a);
     }
 
-    // module.exports = doccy;
+    if (isThunk$1(a)) {
+        renderedA = renderThunk(a, null);
+    }
+
+    return {
+        a: renderedA,
+        b: renderedB
+    };
 }
 
-// /*global window, global*/
-
-// var root = typeof window !== 'undefined' ?
-//     window : typeof global !== 'undefined' ?
-//     global : {};
-
-
-// function Individual(key, value) {
-//     if (key in root) {
-//         return root[key];
-//     }
-
-//     root[key] = value;
-
-//     return value;
-// }
-
-
-// function OneVersion(moduleName, version, defaultValue) {
-//                 console.log(moduleName, version, defaultValue)
-//     var key = '__INDIVIDUAL_ONE_VERSION_' + moduleName;
-//     var enforceKey = key + '_ENFORCE_SINGLETON';
-//                       console.log('enf',enforceKey, 'versioin',version)
-//     var versionValue = Individual(enforceKey, version);
-
-//     if (versionValue !== version) {
-//         throw new Error('Can only have one copy of ' +
-//             moduleName + '.\n' +
-//             'You already have version ' + versionValue +
-//             ' installed.\n' +
-//             'This means you cannot install version ' + version);
-//     }
-
-//     return Individual(key, defaultValue);
-// }
-
-
-function isObject(x) {
-    return typeof x === "object" && x !== null;
+function isVirtualNode$1(x) {
+    return x && x.type === "VirtualNode" && x.version === version$1;
 }
 
-function applyProperties(node, props, previous) {
+function isHook$1(hook) {
+    return hook && (typeof hook.hook === "function" && !hook.hasOwnProperty("hook") || typeof hook.unhook === "function" && !hook.hasOwnProperty("unhook"));
+}
+
+function isVirtualText$1(x) {
+    return x && x.type === "VirtualText" && x.version === version$1;
+}
+
+function isWidget$1(w) {
+    return w && w.type === "Widget";
+}
+
+function isThunk$1(t) {
+    return t && t.type === "Thunk";
+}
+
+function applyProperties$1(node, props, previous) {
     for (var propName in props) {
         var propValue = props[propName];
 
         if (propValue === undefined) {
             removeProperty(node, propName, propValue, previous);
-        } else if (isHook(propValue)) {
+        } else if (isHook$1(propValue)) {
             removeProperty(node, propName, propValue, previous);
             if (propValue.hook) {
                 propValue.hook(node, propName, previous ? previous[propName] : undefined);
             }
         } else {
-            if (isObject(propValue)) {
-                patchObject(node, props, previous, propName, propValue);
+            if (isPlainObject(propValue)) {
+                patchObject$1(node, props, previous, propName, propValue);
             } else {
                 node[propName] = propValue;
             }
@@ -236,7 +324,44 @@ function applyProperties(node, props, previous) {
     }
 }
 
-function removeProperty(node, propName, propValue, previous) {
+function patchObject$1(node, props, previous, propName, propValue) {
+    var previousValue = previous ? previous[propName] : undefined;
+
+    // Set attributes
+    if (propName === "attributes") {
+        for (var attrName in propValue) {
+            var attrValue = propValue[attrName];
+
+            if (attrValue === undefined) {
+                node.removeAttribute(attrName);
+            } else {
+                node.setAttribute(attrName, attrValue);
+            }
+        }
+
+        return;
+    }
+
+    if (previousValue && isPlainObject(previousValue) && getPrototype(previousValue) !== getPrototype(propValue)) {
+        node[propName] = propValue;
+        return;
+    }
+
+    if (!isPlainObject(node[propName])) {
+        node[propName] = {};
+    }
+
+    var replacer = propName === "style" ? "" : undefined;
+
+    for (var k in propValue) {
+        var value = propValue[k];
+        node[propName][k] = value === undefined ? replacer : value;
+    }
+}
+
+var version = 2;
+
+function removeProperty$1(node, propName, propValue, previous) {
     if (previous) {
         var previousValue = previous[propName];
 
@@ -260,171 +385,9 @@ function removeProperty(node, propName, propValue, previous) {
     }
 }
 
-function patchObject(node, props, previous, propName, propValue) {
-    var previousValue = previous ? previous[propName] : undefined;
-
-    // Set attributes
-    if (propName === "attributes") {
-        for (var attrName in propValue) {
-            var attrValue = propValue[attrName];
-
-            if (attrValue === undefined) {
-                node.removeAttribute(attrName);
-            } else {
-                node.setAttribute(attrName, attrValue);
-            }
-        }
-
-        return;
-    }
-
-    if (previousValue && isObject(previousValue) && getPrototype(previousValue) !== getPrototype(propValue)) {
-        node[propName] = propValue;
-        return;
-    }
-
-    if (!isObject(node[propName])) {
-        node[propName] = {};
-    }
-
-    var replacer = propName === "style" ? "" : undefined;
-
-    for (var k in propValue) {
-        var value = propValue[k];
-        node[propName][k] = value === undefined ? replacer : value;
-    }
-}
-
-function createElement(vnode, opts) {
-    var doc = opts ? opts.document || document : document;
-    var warn = opts ? opts.warn : null;
-
-    vnode = handleThunk(vnode).a;
-
-    if (isWidget(vnode)) {
-        return vnode.init();
-    } else if (isVirtualText(vnode)) {
-        return doc.createTextNode(vnode.text);
-    } else if (!isVirtualNode(vnode)) {
-        if (warn) {
-            warn("Item is not a valid virtual dom node", vnode);
-        }
-        return null;
-    }
-
-    var node = vnode.namespace === null ? doc.createElement(vnode.tagName) : doc.createElementNS(vnode.namespace, vnode.tagName);
-
-    var props = vnode.properties;
-    applyProperties(node, props);
-
-    var children = vnode.children;
-
-    for (var i = 0; i < children.length; i++) {
-        var childNode = createElement(children[i], opts);
-        if (childNode) {
-            node.appendChild(childNode);
-        }
-    }
-
-    return node;
-}
-
-var noChild = {};
-
-function recurse(rootNode, tree, indices, nodes, rootIndex) {
-    nodes = nodes || {};
-
-    if (rootNode) {
-        if (indexInRange(indices, rootIndex, rootIndex)) {
-            nodes[rootIndex] = rootNode;
-        }
-
-        var vChildren = tree.children;
-
-        if (vChildren) {
-
-            var childNodes = rootNode.childNodes;
-
-            for (var i = 0; i < tree.children.length; i++) {
-                rootIndex += 1;
-
-                var vChild = vChildren[i] || noChild;
-                var nextIndex = rootIndex + (vChild.count || 0);
-
-                // skip recursion down the tree if there are no nodes down here
-                if (indexInRange(indices, rootIndex, nextIndex)) {
-                    recurse(childNodes[i], vChild, indices, nodes, rootIndex);
-                }
-
-                rootIndex = nextIndex;
-            }
-        }
-    }
-
-    return nodes;
-}
-
-// Binary search for an index in the interval [left, right]
-function indexInRange(indices, left, right) {
-    if (indices.length === 0) {
-        return false;
-    }
-
-    var minIndex = 0;
-    var maxIndex = indices.length - 1;
-    var currentIndex;
-    var currentItem;
-
-    while (minIndex <= maxIndex) {
-        currentIndex = (maxIndex + minIndex) / 2 >> 0;
-        currentItem = indices[currentIndex];
-
-        if (minIndex === maxIndex) {
-            return currentItem >= left && currentItem <= right;
-        } else if (currentItem < left) {
-            minIndex = currentIndex + 1;
-        } else if (currentItem > right) {
-            maxIndex = currentIndex - 1;
-        } else {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-function ascending(a, b) {
-    return a > b ? 1 : -1;
-}
-
 function destroyWidget(domNode, w) {
     if (typeof w.destroy === "function" && isWidget(w)) {
         w.destroy(domNode);
-    }
-}
-
-function reorderChildren(domNode, moves) {
-    var childNodes = domNode.childNodes;
-    var keyMap = {};
-    var node;
-    var remove;
-    var insert;
-
-    for (var i = 0; i < moves.removes.length; i++) {
-        remove = moves.removes[i];
-        node = childNodes[remove.from];
-        if (remove.key) {
-            keyMap[remove.key] = node;
-        }
-        domNode.removeChild(node);
-    }
-
-    var length = childNodes.length;
-    for (var j = 0; j < moves.inserts.length; j++) {
-        insert = moves.inserts[j];
-        node = keyMap[insert.key];
-        // this is the weirdest bug i've ever seen in webkit
-        domNode.insertBefore(node, insert.to >= length++ ? null : childNodes[insert.to]);
     }
 }
 
@@ -435,41 +398,6 @@ function patch(rootNode, patches, renderOptions) {
 
     return renderOptions.patch(rootNode, patches, renderOptions);
 }
-
-function handleThunk(a, b) {
-    var renderedA = a;
-    var renderedB = b;
-
-    if (isThunk(b)) {
-        renderedB = renderThunk(b, a);
-    }
-
-    if (isThunk(a)) {
-        renderedA = renderThunk(a, null);
-    }
-
-    return {
-        a: renderedA,
-        b: renderedB
-    };
-}
-
-// function renderThunk(thunk, previous) {
-//     var renderedThunk = thunk.vnode
-
-//     if (!renderedThunk) {
-//         renderedThunk = thunk.vnode = thunk.render(previous)
-//     }
-
-//     if (!(isVirtualNode(renderedThunk) ||
-//             isVirtualText(renderedThunk) ||
-//             isWidget(renderedThunk))) {
-//         throw new Error("thunk did not return a valid node");
-//     }
-
-//     return renderedThunk
-// }
-
 
 function isThunk(t) {
     return t && t.type === "Thunk";
@@ -524,8 +452,8 @@ function diffProps(a, b) {
 
         if (aValue === bValue) {
             continue;
-        } else if (isObject(aValue) && isObject(bValue)) {
-            if (getPrototype(bValue) !== getPrototype(aValue)) {
+        } else if (isPlainObject(aValue) && isPlainObject(bValue)) {
+            if (getPrototype$1(bValue) !== getPrototype$1(aValue)) {
                 diff = diff || {};
                 diff[aKey] = bValue;
             } else if (isHook(bValue)) {
@@ -554,7 +482,7 @@ function diffProps(a, b) {
     return diff;
 }
 
-function getPrototype(value) {
+function getPrototype$1(value) {
     if (Object.getPrototypeOf) {
         return Object.getPrototypeOf(value);
     } else if (value.__proto__) {
@@ -1205,57 +1133,206 @@ VirtualText.prototype.type = "VirtualText";
 ///////////////////////////////
 
 
-var a = assembly('a');
-var article = assembly('article');
-var aside = assembly('aside');
-var div = assembly('div');
-var figcaption = assembly('figcaption');
-var figure = assembly('figure');
-var footer = assembly('footer');
-var h1 = assembly('h1');
-var h2 = assembly('h2');
-var header = assembly('header');
-var img = assembly('img');
-var li = assembly('li');
-var mark = assembly('mark');
-var nav = assembly('nav');
-var section = assembly('section');
-var ul = assembly('ul');
-// Data
-var image = {
-    src: 'https://www.google.co.uk/logos/doodles/2016/100th-anniversary-of-completion-of-the-trans-siberian-railway-6269398706814976-vacta.gif',
-    width: 85,
-    height: 85,
-    alt: 'Jennifer Marsman'
-};
+const a = assembly('a');
+const abbr = assembly('abbr');
+const address = assembly('address');
+const area = assembly('area');
+const article = assembly('article');
+const aside = assembly('aside');
+const audio = assembly('audio');
+const b = assembly('b');
+const base = assembly('base');
+const bdi = assembly('bdi');
+const bdo = assembly('bdo');
+const blockquote = assembly('blockquote');
+const body = assembly('body');
+const br = assembly('br');
+const button = assembly('button');
+const canvas = assembly('canvas');
+const caption = assembly('caption');
+const cite = assembly('cite');
+const code = assembly('code');
+const col = assembly('col');
+const colgroup = assembly('colgroup');
+const command = assembly('command');
+const dd = assembly('dd');
+const del = assembly('del');
+const dfn = assembly('dfn');
+const div = assembly('div');
+const dl = assembly('dl');
+const doctype = assembly('doctype');
+const dt = assembly('dt');
+const em = assembly('em');
+const embed = assembly('embed');
+const fieldset = assembly('fieldset');
+const figcaption = assembly('figcaption');
+const figure = assembly('figure');
+const footer = assembly('footer');
+const form = assembly('form');
+const h1 = assembly('h1');
+const h2 = assembly('h2');
+const h3 = assembly('h3');
+const h4 = assembly('h4');
+const h5 = assembly('h5');
+const h6 = assembly('h6');
+const header = assembly('header');
+const hgroup = assembly('hgroup');
+const hr = assembly('hr');
+const html = assembly('html');
+const i = assembly('i');
+const iframe = assembly('iframe');
+const img = assembly('img');
+const input = assembly('input');
+const ins = assembly('ins');
+const kbd = assembly('kbd');
+const keygen = assembly('keygen');
+const label = assembly('label');
+const legend = assembly('legend');
+const li = assembly('li');
+const link = assembly('link');
+const map = assembly('map');
+const mark = assembly('mark');
+const menu = assembly('menu');
+const meta = assembly('meta');
+const nav = assembly('nav');
+const noscript = assembly('noscript');
+const object = assembly('object');
+const ol = assembly('ol');
+const optgroup = assembly('optgroup');
+const option = assembly('option');
+const p = assembly('p');
+const param = assembly('param');
+const pre = assembly('pre');
+const progress = assembly('progress');
+const q = assembly('q');
+const rp = assembly('rp');
+const rt = assembly('rt');
+const ruby = assembly('ruby');
+const s = assembly('s');
+const samp = assembly('samp');
+const script = assembly('script');
+const section = assembly('section');
+const select = assembly('select');
+const small = assembly('small');
+const source = assembly('source');
+const span = assembly('span');
+const strong = assembly('strong');
+const style = assembly('style');
+const sub = assembly('sub');
+const sup = assembly('sup');
+const table = assembly('table');
+const tbody = assembly('tbody');
+const td = assembly('td');
+const textarea = assembly('textarea');
+const tfoot = assembly('tfoot');
+const th = assembly('th');
+const thead = assembly('thead');
+const title = assembly('title');
+const tr = assembly('tr');
+const ul = assembly('ul');
+const v = assembly('var');
+const video = assembly('video');
 
-var articleSection2 = 'This is the second article. These articles could be blog posts, etc.';
-var article1Header = 'Article #1h1';
-// Data
+exports.a = a;
+exports.abbr = abbr;
+exports.address = address;
+exports.area = area;
+exports.article = article;
+exports.aside = aside;
+exports.audio = audio;
+exports.b = b;
+exports.base = base;
+exports.bdi = bdi;
+exports.bdo = bdo;
+exports.blockquote = blockquote;
+exports.body = body;
+exports.br = br;
+exports.button = button;
+exports.canvas = canvas;
+exports.caption = caption;
+exports.cite = cite;
+exports.code = code;
+exports.col = col;
+exports.colgroup = colgroup;
+exports.command = command;
+exports.dd = dd;
+exports.del = del;
+exports.dfn = dfn;
+exports.div = div;
+exports.dl = dl;
+exports.doctype = doctype;
+exports.dt = dt;
+exports.em = em;
+exports.embed = embed;
+exports.fieldset = fieldset;
+exports.figcaption = figcaption;
+exports.figure = figure;
+exports.footer = footer;
+exports.form = form;
+exports.h1 = h1;
+exports.h2 = h2;
+exports.h3 = h3;
+exports.h4 = h4;
+exports.h5 = h5;
+exports.h6 = h6;
+exports.header = header;
+exports.hgroup = hgroup;
+exports.hr = hr;
+exports.html = html;
+exports.i = i;
+exports.iframe = iframe;
+exports.img = img;
+exports.input = input;
+exports.ins = ins;
+exports.kbd = kbd;
+exports.keygen = keygen;
+exports.label = label;
+exports.legend = legend;
+exports.li = li;
+exports.link = link;
+exports.map = map;
+exports.mark = mark;
+exports.menu = menu;
+exports.meta = meta;
+exports.nav = nav;
+exports.noscript = noscript;
+exports.object = object;
+exports.ol = ol;
+exports.optgroup = optgroup;
+exports.option = option;
+exports.p = p;
+exports.param = param;
+exports.pre = pre;
+exports.progress = progress;
+exports.q = q;
+exports.rp = rp;
+exports.rt = rt;
+exports.ruby = ruby;
+exports.s = s;
+exports.samp = samp;
+exports.script = script;
+exports.section = section;
+exports.select = select;
+exports.small = small;
+exports.source = source;
+exports.span = span;
+exports.strong = strong;
+exports.style = style;
+exports.sub = sub;
+exports.sup = sup;
+exports.table = table;
+exports.tbody = tbody;
+exports.td = td;
+exports.textarea = textarea;
+exports.tfoot = tfoot;
+exports.th = th;
+exports.thead = thead;
+exports.title = title;
+exports.tr = tr;
+exports.ul = ul;
+exports.v = v;
+exports.video = video;
 
-
-/// HTML 1
-var html1 = div(header({ class: 'red', 'data-hello': 'World!', style: { 'background': '#2f2' } }, h1('Header in h1'), h2('Subheader in h2')), nav(ul(li(a({ href: 'http://google.com', class: 'some-class' }, 'Menu Option 1a')), li(a({ href: 'http://facebook.com', class: 'some-class' }, 'Menu Option 2a')), li(a({ href: 'http://youtube.com' }, 'Menu Option 3a')))), section(article(header({ id: 'juliensHeader' }, h1(article1Header)), section('This is the first article. This is', mark('highlightedmark'), '.')), article(header(h1('Article #2h1')), section({ id: 'whatsUpJack' }, articleSection2))), aside(section(h1('Linksh1'), ul(li(a({ href: '#' }, 'Link 1a')), li(a({ href: '#' }, 'Link 2a')), li(a({ href: '#' }, 'Link 3a')))), figure(img({ src: image.src, width: image.width, height: image.height, alt: image.alt }), figcaption('Jennifer Marsman'))), footer('Footer - Copyright 2016'));
-
-/// HTML 2
-var html2 = div(header({ class: 'red', 'data-hello': 'World!', style: { 'background': 'pink' } }, h1('Header in h1'), h2('Subheader in h2')), nav(ul(li(a({ href: 'http://google.com', class: 'some-class' }, 'Menu Option 1a')), h1('WHAT THIS IS NOT THE SAMMEEEE'), li(a({ href: 'http://youtube.com' }, 'Menu Option 3a')))), section(article(header({ id: 'juliensHeader' }, h1('BLALALALALALALALA')), section('This is the first article. This is', mark('highlightedmark'), '.')), article(header(h1('Article #2h1')), section({ id: 'whatsUpJack' }, articleSection2))), aside(section(h1('Linksh1'), ul(li(a({ href: '#' }, 'Link 1a')), li(a({ href: '#' }, 'Link 2a')), li(a({ href: '#' }, 'Link 3a')))), figure(img({ src: 'https://avatars0.githubusercontent.com/u/7676299?v=3&s=466', width: image.width, height: image.height, alt: image.alt }), figcaption('ergergergerg'))), footer('FOOOOOOOOOOOOOOOOO'));
-
-// Render page intially 
-var el = createElement(html1);
-document.body.appendChild(el);
-
-//Make changes
-
-// setTimeout(function() {  
-//   var patches = diff(html1, html2);
-//   patch(el, patches)
-// }, 2000)
-
-
-// setTimeout(function() {
-
-//   var patches = diff(html2, html1);
-//   patch(el, patches)
-// }, 4000)
+Object.defineProperty(exports, '__esModule', { value: true });
 
 })));

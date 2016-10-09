@@ -37,6 +37,7 @@
   "dependencies": {
     "browser-split": "0.0.1",
     "ev-store": "^7.0.0",
+    "lodash-es": "^4.16.4",
     "parse-tag": "^1.0.0",
     "virtual-hyperscript": "^4.6.0",
     "x-is-array": "^0.1.0"

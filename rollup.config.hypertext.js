@@ -2,8 +2,8 @@ import babel from 'rollup-plugin-babel';
 
 export default {
     moduleName: 'hypertext',
-    entry: 'src/index.js',
+    entry: 'src/demo.js',
     plugins: [babel()],
     format: 'umd',
-    dest: 'dist/hypertext.js'
+    dest: 'demo/app.js'
 };
