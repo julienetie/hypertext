@@ -1,7 +1,6 @@
 import assembly from './assembly';
 import create from './create';
 
-///////////////////////////////
 
 export const a = assembly('a');
 export const abbr = assembly('abbr');
@@ -104,5 +103,5 @@ export const v = assembly('var');
 export const video = assembly('video');
 
 
-// API
+// Create API
 export const createNodes = create;

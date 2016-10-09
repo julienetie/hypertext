@@ -1,31 +1,22 @@
 import isPlainObject from '../node_modules/lodash-es/isPlainObject';
 import { isThunk, isVirtualText, isVirtualNode, isHook, isWidget } from './conditions';
+import version from './version';
 
-var version = 2;
 
-
-function handleThunk(a, b) {
-    var renderedA = a
-    var renderedB = b
-
-    if (isThunk(b)) {
-        renderedB = renderThunk(b, a)
-    }
-
-    if (isThunk(a)) {
-        renderedA = renderThunk(a, null)
-    }
-
+const handleThunk = (a, b) => {
     return {
-        a: renderedA,
-        b: renderedB
+        a: isThunk(a) ? renderThunk(a, null) : a,
+        b: isThunk(b) ? renderThunk(b, a) : b
     }
 }
 
 
-function applyProperties(node, props, previous) {
-    for (var propName in props) {
-        var propValue = props[propName]
+const applyProperties = (node, props, previous) => {
+    let propName;
+    let propValue;
+
+    for (propName in props) {
+        propValue = props[propName]
 
         if (propValue === undefined) {
             removeProperty(node, propName, propValue, previous);
@@ -46,50 +37,62 @@ function applyProperties(node, props, previous) {
     }
 }
 
-export default function create(vnode, opts) {
-    var doc = opts ? opts.document || document : document
-    var warn = opts ? opts.warn : null
+export default function create(virtualNode, opts) {
+    const doc = opts ? opts.document || document : document;
+    const warn = opts ? opts.warn : null;
+    let i;
+    let node;
+    let children;
+    let childNode;
+    let vnode = virtualNode;
 
-    vnode = handleThunk(vnode).a
+    vnode = handleThunk(virtualNode).a;
 
     if (isWidget(vnode)) {
-        return vnode.init()
+        return vnode.init();
     } else if (isVirtualText(vnode)) {
-        return doc.createTextNode(vnode.text)
+        return doc.createTextNode(vnode.text);
     } else if (!isVirtualNode(vnode)) {
         if (warn) {
-            warn("Item is not a valid virtual dom node", vnode)
+            warn("Item is not a valid virtual dom node", vnode);
         }
-        return null
+        return null;
     }
 
-    var node = (vnode.namespace === null) ?
-        doc.createElement(vnode.tagName) :
-        doc.createElementNS(vnode.namespace, vnode.tagName)
+    if (vnode.namespace === null) {
+        node = doc.createElement(vnode.tagName);
+    } else {
+        node = doc.createElementNS(vnode.namespace, vnode.tagName);
+    }
 
-    var props = vnode.properties
-    applyProperties(node, props)
+    applyProperties(node, vnode.properties);
 
-    var children = vnode.children
+    children = vnode.children;
 
-    for (var i = 0; i < children.length; i++) {
-        var childNode = create(children[i], opts)
+    for (i = 0; i < children.length; i++) {
+        childNode = create(children[i], opts);
         if (childNode) {
-            node.appendChild(childNode)
+            node.appendChild(childNode);
         }
     }
 
-    return node
+    return node;
 }
 
 
-function patchObject(node, props, previous, propName, propValue) {
-    var previousValue = previous ? previous[propName] : undefined
+const patchObject = (node, props, previous, propName, propValue) => {
+    let previousValue = previous ? previous[propName] : undefined;
+    let attrValue;
+    let attrName;
+    let replacer;
+    let k;
+    let value;
 
     // Set attributes
     if (propName === "attributes") {
-        for (var attrName in propValue) {
-            var attrValue = propValue[attrName]
+
+        for (attrName in propValue) {
+            attrValue = propValue[attrName]
 
             if (attrValue === undefined) {
                 node.removeAttribute(attrName)
@@ -98,56 +101,53 @@ function patchObject(node, props, previous, propName, propValue) {
             }
         }
 
-        return
+        return;
     }
 
-    if (previousValue && isPlainObject(previousValue) &&
-        getPrototype(previousValue) !== getPrototype(propValue)) {
-        node[propName] = propValue
-        return
-    }
+
+    // TODO, check how style is being handled.
+
+    // console.log(node, propName, propValue)
+    //  if (previousValue && isPlainObject(previousValue) &&
+    //      getPrototype(previousValue) !== getPrototype(propValue)) {
+    //      console.log(node, popName, propValue)
+    //      node[propName] = propValue;
+    //      return;
+    //  }
 
     if (!isPlainObject(node[propName])) {
-        node[propName] = {}
+        node[propName] = {};
     }
 
-    var replacer = propName === "style" ? "" : undefined
+    replacer = propName === "style" ? "" : undefined
 
-    for (var k in propValue) {
-        var value = propValue[k]
-        node[propName][k] = (value === undefined) ? replacer : value
+    for (k in propValue) {
+        value = propValue[k];
+        node[propName][k] = (value === undefined) ? replacer : value;
     }
 }
-function removeProperty(node, propName, propValue, previous) {
+
+
+const removeProperty = (node, propName, propValue, previous) => {
     if (previous) {
-        var previousValue = previous[propName]
+        const previousValue = previous[propName]
 
         if (!isHook(previousValue)) {
             if (propName === "attributes") {
                 for (var attrName in previousValue) {
-                    node.removeAttribute(attrName)
+                    node.removeAttribute(attrName);
                 }
             } else if (propName === "style") {
                 for (var i in previousValue) {
-                    node.style[i] = ""
+                    node.style[i] = "";
                 }
             } else if (typeof previousValue === "string") {
-                node[propName] = ""
+                node[propName] = "";
             } else {
-                node[propName] = null
+                node[propName] = null;
             }
         } else if (previousValue.unhook) {
-            previousValue.unhook(node, propName, propValue)
+            previousValue.unhook(node, propName, propValue);
         }
-    }
-}
-
-function getPrototype(value) {
-    if (Object.getPrototypeOf) {
-        return Object.getPrototypeOf(value)
-    } else if (value.__proto__) {
-        return value.__proto__
-    } else if (value.constructor) {
-        return value.constructor.prototype
     }
 }

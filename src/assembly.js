@@ -1,38 +1,55 @@
-import { SoftSetHook, evHook } from './ev-store';
+import { SoftSetHook, eventHook } from './ev-store';
 import isPlainObject from '../node_modules/lodash-es/isPlainObject';
 import isArray from '../node_modules/lodash-es/isArray';
-import VirtualNode from './virtual-node';
-import {UnexpectedVirtualElement, UnsupportedValueType, errorString} from './validation';
-import { 
-    isThunk, 
+import isEmpty from '../node_modules/lodash-es/isEmpty';
+import { VirtualNode, VirtualText } from './virtual-node';
+import version from './version';
+import { UnexpectedVirtualElement, UnsupportedValueType, errorString } from './validation';
+import {
+    isThunk,
     isVirtualText,
-    VirtualText, 
     isChild,
-    isHook, 
-    isVirtualNode, 
-    isWidget 
+    isHook,
+    isVirtualNode,
+    isWidget
 } from './conditions';
 
-var version = 2;
 
+const transformProperties = (props) => {
 
-export default function assembly(tagName) {
+    for (var propName in props) {
+        if (props.hasOwnProperty(propName)) {
+            var value = props[propName];
+            if (isHook(value)) {
+                continue;
+            }
+            if (propName.substr(0, 3) === 'ev-') {
+                props[propName] = eventHook(value);
+            }
+        }
+    }
+}
+
+const assembly = (tagName) => {
 
     return function(...args) {
-        var childNodes = [];
-        var children = [];
-        var tag, props, key, namespace;
-        var item;
+        let childNodes = [];
+        let children = [];
+        let props;
+        let key;
+        let namespace;
+        let item;
+        let i;
 
-        for (let i = 0; i < args.length; i++) {
+        for (i = 0; i < args.length; i++) {
             item = args[i];
 
             //Check if text node
-            if (typeof item === 'string') {
+            if (typeof item === 'string' || typeof item === 'number') {
                 children.push(item);
             } else if (item.hasOwnProperty('descendantHooks')) {
                 children.push(item);
-            } else if (item.constructor === {}.constructor) {
+            } else if (isPlainObject(item)) {
                 props = item;
             }
 
@@ -78,39 +95,32 @@ export default function assembly(tagName) {
             }
             props.value = softSetHook(props.value);
         }
-
-        transformProperties(props);
-
-        if (children !== undefined && children !== null) {
-            addChild(children, childNodes, tagName, props);
+        if (!isEmpty(props)) {
+            transformProperties(props);
         }
 
-
-        props.isProp = true;
-
+        addChild(children, childNodes, tagName, props);
         return new VirtualNode(tagName, props, childNodes, key, namespace);
     };
 }
 
+    
 
+const addChild = (child, childNodes, tag, props) => {
 
-function addChild(c, childNodes, tag, props) {
-
-    if (typeof c === 'string') {
-        childNodes.push(new VirtualText(c));
-    } else if (typeof c === 'number') {
-        childNodes.push(new VirtualText(String(c)));
-    } else if (isChild(c)) {
-        childNodes.push(c);
-    } else if (isArray(c)) {
-        for (var i = 0; i < c.length; i++) {
-            addChild(c[i], childNodes, tag, props);
+    if (typeof child === 'string' || typeof child === 'number') {
+        childNodes.push(new VirtualText(child));
+    } else if (isChild(child)) {
+        childNodes.push(child);
+    } else if (isArray(child)) {
+        for (var i = 0; i < child.length; i++) {
+            addChild(child[i], childNodes, tag, props);
         }
-    } else if (c === null || c === undefined) {
+    } else if (child === null || child === undefined) {
         return;
     } else {
         throw UnexpectedVirtualElement({
-            foreignObject: c,
+            foreignObject: child,
             parentVnode: {
                 tagName: tag,
                 properties: props
@@ -119,20 +129,4 @@ function addChild(c, childNodes, tag, props) {
     }
 }
 
-
-function transformProperties(props) {
-    for (var propName in props) {
-        if (props.hasOwnProperty(propName)) {
-            var value = props[propName];
-
-            if (isHook(value)) {
-                continue;
-            }
-
-            if (propName.substr(0, 3) === 'ev-') {
-                // add ev-foo support
-                props[propName] = evHook(value);
-            }
-        }
-    }
-}
+export default assembly;

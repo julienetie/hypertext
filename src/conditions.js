@@ -1,58 +1,61 @@
-const version = 2;
+import version from './version';
+import isArray from '../node_modules/lodash-es/isArray';
 
 
-export function VirtualText(text) {
-	this.text = String(text)
+const isVirtualText = (x) => {
+	return x && x.type === "VirtualText" && x.version === version;
+};
+
+
+const isThunk = (t) => {
+	return t && t.type === "Thunk";
 }
 
 
-export let isVirtualText = (x) => {
-	return x && x.type === "VirtualText" && x.version === version
-}
-
-export function isThunk(t) {
-	return t && t.type === "Thunk"
-}
-
-
-export const isHook = (hook) => {
+const isHook = (hook) => {
 	return hook &&
 		(typeof hook.hook === "function" && !hook.hasOwnProperty("hook") ||
-			typeof hook.unhook === "function" && !hook.hasOwnProperty("unhook"))
-}
+			typeof hook.unhook === "function" && !hook.hasOwnProperty("unhook"));
+};
 
 
-export const isVirtualNode = (x) => {
-	return x && x.type === "VirtualNode" && x.version === version
-}
+const isVirtualNode = (x) => {
+	return x && x.type === "VirtualNode" && x.version === version;
+};
 
 
-export const isWidget= (w) =>{
-	return w && w.type === "Widget"
-}
+const isWidget = (w) => {
+	return w && w.type === "Widget";
+};
 
 
-export const hasPatches = (patch) => {
+const hasPatches = (patch) => {
 	for (var index in patch) {
 		if (index !== "a") {
-			return true
+			return true;
 		}
 	}
 
-	return false
-}
+	return false;
+};
 
 
-// export const isArray = (obj) => {
-// 	return toString.call(obj) === "[object Array]"
-// }
-
-
-export const isChild = (x) => {
+const isChild = (x) => {
 	return isVirtualNode(x) || isVirtualText(x) || isWidget(x) || isThunk(x);
-}
+};
 
 
-export const isChildren = (x) => {
+const isChildren = (x) => {
 	return typeof x === 'string' || isArray(x) || isChild(x);
-}
+};
+
+export { 
+	isVirtualText, 
+	isThunk, 
+	isHook, 
+	isVirtualNode, 
+	isWidget, 
+	hasPatches, 
+	isChild, 
+	isChildren 
+};

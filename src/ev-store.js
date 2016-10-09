@@ -4,11 +4,12 @@ var root = typeof window !== 'undefined' ?
 
 function Individual(key, value) {
     if (key in root) {
+    	// console.log('key in root', root[key])
         return root[key];
     }
 
     root[key] = value;
-
+// console.log('root', root[key])
     return value;
 }
 
@@ -42,30 +43,31 @@ export function EvStore(elem) {
     if (!hash) {
         hash = elem[hashKey] = {};
     }
-
+    // console.log(hash)
     return hash;
 }
 
 
-export function evHook(value) {
-    if (!(this instanceof evHook)) {
-        return new evHook(value);
+export function eventHook(value) {
+    if (!(this instanceof eventHook)) {
+        return new eventHook(value);
     }
     this.value = value;
 }
 
 
-evHook.prototype.hook = function(node, propertyName) {
-    console.log('node',node)
+eventHook.prototype.hook = function(node, propertyName) {
+    // console.log('node',node)
     var es = EvStore(node);
-    console.log('es',es)
+    // console.log('es',es)
     var propName = propertyName.substr(3);
 
     es[propName] = this.value;
+    // console.log(propName, es[propName])
 };
 
 
-evHook.prototype.unhook = function(node, propertyName) {
+eventHook.prototype.unhook = function(node, propertyName) {
     var es = EvStore(node);
     var propName = propertyName.substr(3);
 
