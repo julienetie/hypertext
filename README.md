@@ -108,9 +108,9 @@ There's a few good reasons to use _hypertext_
 - hypertext is valid JavaScript.
 - Only supports valid HTML tags (Custom HTML pending).
 - Supports condtitions and easy to use iterations (loop() fn pending).
-- The syntax is "arguably" more readable than HTML: ```</closingTag>``` === ```)```.
+- For some, the syntax may be more readable than markup: ```</closingTag>``` === ```)```.
 - Has no dependencies, but obviously requires a virtual DOM if you care about repaint/ reflow (You should).
-- **_hypertext_** aims to be virtual-dom agnostic (_e.g. React, Vue 2.0, incremental dom support_) as "most" of 
+- **_hypertext_** hopes to one day be virtual-dom agnostic (_e.g. React, Vue 2.0, incremental dom support_) as "most" of 
 the differences between various virtual dom libraries do not warrant complete re-implementations of hypertext.
 
 #### **5**) Thanks
