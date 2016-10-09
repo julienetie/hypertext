@@ -15,7 +15,7 @@ Create [virtual-dom](https://github.com/Matt-Esch/virtual-dom)'s [virtual-hypers
 
 &nbsp;&nbsp;&nbsp;&nbsp;<sup>To demo via ES5 use **```./dist/hypertext-not-for-production.min.js```** all tags will miserably be global.</sup>
 
-- &nbsp;&nbsp;&nbsp;&nbsp;<sup>```npm i --save hypertext``` : Install</sup> **Not yet on npm, git clone for now**
+- &nbsp;&nbsp;&nbsp;&nbsp;<sup>```npm i --save hypertext``` : Install **Not yet on npm, git clone for now**</sup> 
 - &nbsp;&nbsp;&nbsp;&nbsp;<sup>```npm run play``` : Host playground.js on port 9966</sup>
 - &nbsp;&nbsp;&nbsp;&nbsp;<sup>```npm run build``` : Builds es6 & cjs</sup>
 - &nbsp;&nbsp;&nbsp;&nbsp;<sup>```npm run global``` : Builds not-for-production.min.js</sup>
