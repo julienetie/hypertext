@@ -115,7 +115,7 @@ the differences between various virtual dom libraries do not warrant complete re
 
 #### **5**) Thanks
 
-To Matt Esch and Jake Verbaten for creating a bunch of cool libraries and modules that inspired hyperscript.
+To Matt Esch and Jake Verbaten for creating a bunch of cool libraries and modules that made hypertext feasible.
 
 [MIT](https://github.com/julienetie/hypertext/blob/master/LICENSE)
 Copyright (c) 2016 Julien Etienne
