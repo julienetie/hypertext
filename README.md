@@ -9,7 +9,7 @@ Create [virtual-dom](https://github.com/Matt-Esch/virtual-dom)'s [virtual-hypers
 
 
 ## What you need to know:
-#### **1**) _hypertext_ requires ES6 or CJS
+#### **1**) _hypertext_ requires ES6 or CJS _(practical ES5 is due shortly)_
 
 &nbsp;&nbsp;&nbsp;&nbsp;<sup>Demo using **```npm run play```** tweak **```./playground.js```** then check port **`9966`**</sup>
 
