@@ -1,131 +1,13 @@
-(function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-  typeof define === 'function' && define.amd ? define(['exports'], factory) :
-  (factory((global.hypertext = global.hypertext || {})));
-}(this, (function (exports) { 'use strict';
-
-/*!
- * Cross-Browser Split 1.1.1
- * Copyright 2007-2012 Steven Levithan <stevenlevithan.com>
- * Available under the MIT License
- * ECMAScript compliant, uniform cross-browser split method
- */
-
-/**
- * Splits a string into an array of strings using a regex or string separator. Matches of the
- * separator are not included in the result array. However, if `separator` is a regex that contains
- * capturing groups, backreferences are spliced into the result each time `separator` is matched.
- * Fixes browser bugs compared to the native `String.prototype.split` and can be used reliably
- * cross-browser.
- * @param {String} str String to split.
- * @param {RegExp|String} separator Regex or string to use for separating the string.
- * @param {Number} [limit] Maximum number of items to include in the result array.
- * @returns {Array} Array of substrings.
- * @example
- *
- * // Basic use
- * split('a b c d', ' ');
- * // -> ['a', 'b', 'c', 'd']
- *
- * // With limit
- * split('a b c d', ' ', 2);
- * // -> ['a', 'b']
- *
- * // Backreferences in result array
- * split('..word1 word2..', /([a-z]+)(\d+)/i);
- * // -> ['..', 'word', '1', ' ', 'word', '2', '..']
- */
-function split(undef) {
-
-  var nativeSplit = String.prototype.split,
-      compliantExecNpcg = /()??/.exec("")[1] === undef,
-
-  // NPCG: nonparticipating capturing group
-  self;
-
-  self = function (str, separator, limit) {
-    // If `separator` is not a regex, use `nativeSplit`
-    if (Object.prototype.toString.call(separator) !== "[object RegExp]") {
-      return nativeSplit.call(str, separator, limit);
-    }
-    var output = [],
-        flags = (separator.ignoreCase ? "i" : "") + (separator.multiline ? "m" : "") + (separator.extended ? "x" : "") + ( // Proposed for ES6
-    separator.sticky ? "y" : ""),
-
-    // Firefox 3+
-    lastLastIndex = 0,
-
-    // Make `global` and avoid `lastIndex` issues by working with a copy
-    separator = new RegExp(separator.source, flags + "g"),
-        separator2,
-        match,
-        lastIndex,
-        lastLength;
-    str += ""; // Type-convert
-    if (!compliantExecNpcg) {
-      // Doesn't need flags gy, but they don't hurt
-      separator2 = new RegExp("^" + separator.source + "$(?!\\s)", flags);
-    }
-    /* Values for `limit`, per the spec:
-     * If undefined: 4294967295 // Math.pow(2, 32) - 1
-     * If 0, Infinity, or NaN: 0
-     * If positive number: limit = Math.floor(limit); if (limit > 4294967295) limit -= 4294967296;
-     * If negative number: 4294967296 - Math.floor(Math.abs(limit))
-     * If other: Type-convert, then use the above rules
-     */
-    limit = limit === undef ? -1 >>> 0 : // Math.pow(2, 32) - 1
-    limit >>> 0; // ToUint32(limit)
-    while (match = separator.exec(str)) {
-      // `separator.lastIndex` is not reliable cross-browser
-      lastIndex = match.index + match[0].length;
-      if (lastIndex > lastLastIndex) {
-        output.push(str.slice(lastLastIndex, match.index));
-        // Fix browsers whose `exec` methods don't consistently return `undefined` for
-        // nonparticipating capturing groups
-        if (!compliantExecNpcg && match.length > 1) {
-          match[0].replace(separator2, function () {
-            for (var i = 1; i < arguments.length - 2; i++) {
-              if (arguments[i] === undef) {
-                match[i] = undef;
-              }
-            }
-          });
-        }
-        if (match.length > 1 && match.index < str.length) {
-          Array.prototype.push.apply(output, match.slice(1));
-        }
-        lastLength = match[0].length;
-        lastLastIndex = lastIndex;
-        if (output.length >= limit) {
-          break;
-        }
-      }
-      if (separator.lastIndex === match.index) {
-        separator.lastIndex++; // Avoid an infinite loop
-      }
-    }
-    if (lastLastIndex === str.length) {
-      if (lastLength || !separator.test("")) {
-        output.push("");
-      }
-    } else {
-      output.push(str.slice(lastLastIndex));
-    }
-    return output.length > limit ? output.slice(0, limit) : output;
-  };
-
-  return self;
-}
-
 var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : {};
 
 function Individual(key, value) {
     if (key in root) {
+        // console.log('key in root', root[key])
         return root[key];
     }
 
     root[key] = value;
-
+    // console.log('root', root[key])
     return value;
 }
 
@@ -153,9 +35,33 @@ function EvStore(elem) {
     if (!hash) {
         hash = elem[hashKey] = {};
     }
-
+    // console.log(hash)
     return hash;
 }
+
+function eventHook(value) {
+    if (!(this instanceof eventHook)) {
+        return new eventHook(value);
+    }
+    this.value = value;
+}
+
+eventHook.prototype.hook = function (node, propertyName) {
+    // console.log('node',node)
+    var es = EvStore(node);
+    // console.log('es',es)
+    var propName = propertyName.substr(3);
+
+    es[propName] = this.value;
+    // console.log(propName, es[propName])
+};
+
+eventHook.prototype.unhook = function (node, propertyName) {
+    var es = EvStore(node);
+    var propName = propertyName.substr(3);
+
+    es[propName] = undefined;
+};
 
 /**
  * Creates a unary function that invokes `func` with its argument transformed.
@@ -171,7 +77,8 @@ function overArg(func, transform) {
   };
 }
 
-var getPrototype$2 = overArg(Object.getPrototypeOf, Object);
+/** Built-in value references. */
+var getPrototype = overArg(Object.getPrototypeOf, Object);
 
 /**
  * Checks if `value` is object-like. A value is object-like if it's not `null`
@@ -201,6 +108,7 @@ function isObjectLike(value) {
   return value != null && typeof value == 'object';
 }
 
+/** `Object#toString` result references. */
 var objectTag = '[object Object]';
 
 /** Used for built-in method references. */
@@ -255,7 +163,7 @@ function isPlainObject(value) {
   if (!isObjectLike(value) || objectToString.call(value) != objectTag) {
     return false;
   }
-  var proto = getPrototype$2(value);
+  var proto = getPrototype(value);
   if (proto === null) {
     return true;
   }
@@ -263,669 +171,864 @@ function isPlainObject(value) {
   return typeof Ctor == 'function' && Ctor instanceof Ctor && funcToString.call(Ctor) == objectCtorString;
 }
 
-var version$1 = 2;
+/**
+ * Checks if `value` is classified as an `Array` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an array, else `false`.
+ * @example
+ *
+ * _.isArray([1, 2, 3]);
+ * // => true
+ *
+ * _.isArray(document.body.children);
+ * // => false
+ *
+ * _.isArray('abc');
+ * // => false
+ *
+ * _.isArray(_.noop);
+ * // => false
+ */
+var isArray = Array.isArray;
 
-function handleThunk$1(a, b) {
-    var renderedA = a;
-    var renderedB = b;
+/** Used for built-in method references. */
+var objectProto$3 = Object.prototype;
 
-    if (isThunk$1(b)) {
-        renderedB = renderThunk(b, a);
+/**
+ * Checks if `value` is likely a prototype object.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a prototype, else `false`.
+ */
+function isPrototype(value) {
+  var Ctor = value && value.constructor,
+      proto = typeof Ctor == 'function' && Ctor.prototype || objectProto$3;
+
+  return value === proto;
+}
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeKeys = overArg(Object.keys, Object);
+
+/** Used for built-in method references. */
+var objectProto$2 = Object.prototype;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty$2 = objectProto$2.hasOwnProperty;
+
+/**
+ * The base implementation of `_.keys` which doesn't treat sparse arrays as dense.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @returns {Array} Returns the array of property names.
+ */
+function baseKeys(object) {
+  if (!isPrototype(object)) {
+    return nativeKeys(object);
+  }
+  var result = [];
+  for (var key in Object(object)) {
+    if (hasOwnProperty$2.call(object, key) && key != 'constructor') {
+      result.push(key);
     }
-
-    if (isThunk$1(a)) {
-        renderedA = renderThunk(a, null);
-    }
-
-    return {
-        a: renderedA,
-        b: renderedB
-    };
+  }
+  return result;
 }
 
-function isVirtualNode$1(x) {
-    return x && x.type === "VirtualNode" && x.version === version$1;
+/**
+ * Checks if `value` is the
+ * [language type](http://www.ecma-international.org/ecma-262/7.0/#sec-ecmascript-language-types)
+ * of `Object`. (e.g. arrays, functions, objects, regexes, `new Number(0)`, and `new String('')`)
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an object, else `false`.
+ * @example
+ *
+ * _.isObject({});
+ * // => true
+ *
+ * _.isObject([1, 2, 3]);
+ * // => true
+ *
+ * _.isObject(_.noop);
+ * // => true
+ *
+ * _.isObject(null);
+ * // => false
+ */
+function isObject(value) {
+  var type = typeof value;
+  return value != null && (type == 'object' || type == 'function');
 }
 
-function isHook$1(hook) {
-    return hook && (typeof hook.hook === "function" && !hook.hasOwnProperty("hook") || typeof hook.unhook === "function" && !hook.hasOwnProperty("unhook"));
+/** `Object#toString` result references. */
+var funcTag = '[object Function]';
+var genTag = '[object GeneratorFunction]';
+var proxyTag = '[object Proxy]';
+
+/** Used for built-in method references. */
+var objectProto$6 = Object.prototype;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var objectToString$2 = objectProto$6.toString;
+
+/**
+ * Checks if `value` is classified as a `Function` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a function, else `false`.
+ * @example
+ *
+ * _.isFunction(_);
+ * // => true
+ *
+ * _.isFunction(/abc/);
+ * // => false
+ */
+function isFunction(value) {
+  // The use of `Object#toString` avoids issues with the `typeof` operator
+  // in Safari 9 which returns 'object' for typed array and other constructors.
+  var tag = isObject(value) ? objectToString$2.call(value) : '';
+  return tag == funcTag || tag == genTag || tag == proxyTag;
 }
 
-function isVirtualText$1(x) {
-    return x && x.type === "VirtualText" && x.version === version$1;
+/** Detect free variable `global` from Node.js. */
+var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
+
+/** Detect free variable `self`. */
+var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+/** Used as a reference to the global object. */
+var root$1 = freeGlobal || freeSelf || Function('return this')();
+
+/** Used to detect overreaching core-js shims. */
+var coreJsData = root$1['__core-js_shared__'];
+
+/** Used to detect methods masquerading as native. */
+var maskSrcKey = function () {
+  var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || '');
+  return uid ? 'Symbol(src)_1.' + uid : '';
+}();
+
+/**
+ * Checks if `func` has its source masked.
+ *
+ * @private
+ * @param {Function} func The function to check.
+ * @returns {boolean} Returns `true` if `func` is masked, else `false`.
+ */
+function isMasked(func) {
+  return !!maskSrcKey && maskSrcKey in func;
 }
 
-function isWidget$1(w) {
-    return w && w.type === "Widget";
+/** Used for built-in method references. */
+var funcProto$2 = Function.prototype;
+
+/** Used to resolve the decompiled source of functions. */
+var funcToString$2 = funcProto$2.toString;
+
+/**
+ * Converts `func` to its source code.
+ *
+ * @private
+ * @param {Function} func The function to process.
+ * @returns {string} Returns the source code.
+ */
+function toSource(func) {
+  if (func != null) {
+    try {
+      return funcToString$2.call(func);
+    } catch (e) {}
+    try {
+      return func + '';
+    } catch (e) {}
+  }
+  return '';
 }
 
-function isThunk$1(t) {
-    return t && t.type === "Thunk";
-}
+/**
+ * Used to match `RegExp`
+ * [syntax characters](http://ecma-international.org/ecma-262/7.0/#sec-patterns).
+ */
+var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
 
-function applyProperties$1(node, props, previous) {
-    for (var propName in props) {
-        var propValue = props[propName];
+/** Used to detect host constructors (Safari). */
+var reIsHostCtor = /^\[object .+?Constructor\]$/;
 
-        if (propValue === undefined) {
-            removeProperty(node, propName, propValue, previous);
-        } else if (isHook$1(propValue)) {
-            removeProperty(node, propName, propValue, previous);
-            if (propValue.hook) {
-                propValue.hook(node, propName, previous ? previous[propName] : undefined);
-            }
-        } else {
-            if (isPlainObject(propValue)) {
-                patchObject$1(node, props, previous, propName, propValue);
-            } else {
-                node[propName] = propValue;
-            }
-        }
-    }
-}
+/** Used for built-in method references. */
+var funcProto$1 = Function.prototype;
+var objectProto$5 = Object.prototype;
 
-function patchObject$1(node, props, previous, propName, propValue) {
-    var previousValue = previous ? previous[propName] : undefined;
+/** Used to resolve the decompiled source of functions. */
+var funcToString$1 = funcProto$1.toString;
 
-    // Set attributes
-    if (propName === "attributes") {
-        for (var attrName in propValue) {
-            var attrValue = propValue[attrName];
+/** Used to check objects for own properties. */
+var hasOwnProperty$3 = objectProto$5.hasOwnProperty;
 
-            if (attrValue === undefined) {
-                node.removeAttribute(attrName);
-            } else {
-                node.setAttribute(attrName, attrValue);
-            }
-        }
+/** Used to detect if a method is native. */
+var reIsNative = RegExp('^' + funcToString$1.call(hasOwnProperty$3).replace(reRegExpChar, '\\$&').replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, '$1.*?') + '$');
 
-        return;
-    }
-
-    if (previousValue && isPlainObject(previousValue) && getPrototype(previousValue) !== getPrototype(propValue)) {
-        node[propName] = propValue;
-        return;
-    }
-
-    if (!isPlainObject(node[propName])) {
-        node[propName] = {};
-    }
-
-    var replacer = propName === "style" ? "" : undefined;
-
-    for (var k in propValue) {
-        var value = propValue[k];
-        node[propName][k] = value === undefined ? replacer : value;
-    }
-}
-
-var version = 2;
-
-function removeProperty$1(node, propName, propValue, previous) {
-    if (previous) {
-        var previousValue = previous[propName];
-
-        if (!isHook(previousValue)) {
-            if (propName === "attributes") {
-                for (var attrName in previousValue) {
-                    node.removeAttribute(attrName);
-                }
-            } else if (propName === "style") {
-                for (var i in previousValue) {
-                    node.style[i] = "";
-                }
-            } else if (typeof previousValue === "string") {
-                node[propName] = "";
-            } else {
-                node[propName] = null;
-            }
-        } else if (previousValue.unhook) {
-            previousValue.unhook(node, propName, propValue);
-        }
-    }
-}
-
-function destroyWidget(domNode, w) {
-    if (typeof w.destroy === "function" && isWidget(w)) {
-        w.destroy(domNode);
-    }
-}
-
-function patch(rootNode, patches, renderOptions) {
-    renderOptions = renderOptions || {};
-    renderOptions.patch = renderOptions.patch && renderOptions.patch !== patch ? renderOptions.patch : patchRecursive;
-    renderOptions.render = renderOptions.render || render;
-
-    return renderOptions.patch(rootNode, patches, renderOptions);
-}
-
-function isThunk(t) {
-    return t && t.type === "Thunk";
-}
-
-function isHook(hook) {
-    return hook && (typeof hook.hook === "function" && !hook.hasOwnProperty("hook") || typeof hook.unhook === "function" && !hook.hasOwnProperty("unhook"));
-}
-
-function isVirtualNode(x) {
-    return x && x.type === "VirtualNode" && x.version === version;
-}
-
-function isVirtualText(x) {
-    return x && x.type === "VirtualText" && x.version === version;
-}
-
-function isWidget(w) {
-    return w && w.type === "Widget";
-}
-
-function VirtualPatch(type, vNode, patch) {
-    this.type = Number(type);
-    this.vNode = vNode;
-    this.patch = patch;
-}
-
-VirtualPatch.prototype.version = version;
-VirtualPatch.prototype.type = "VirtualPatch";
-
-VirtualPatch.NONE = 0;
-VirtualPatch.VTEXT = 1;
-VirtualPatch.VNODE = 2;
-VirtualPatch.WIDGET = 3;
-VirtualPatch.PROPS = 4;
-VirtualPatch.ORDER = 5;
-VirtualPatch.INSERT = 6;
-VirtualPatch.REMOVE = 7;
-VirtualPatch.THUNK = 8;
-
-function diffProps(a, b) {
-    var diff;
-
-    for (var aKey in a) {
-        if (!(aKey in b)) {
-            diff = diff || {};
-            diff[aKey] = undefined;
-        }
-
-        var aValue = a[aKey];
-        var bValue = b[aKey];
-
-        if (aValue === bValue) {
-            continue;
-        } else if (isPlainObject(aValue) && isPlainObject(bValue)) {
-            if (getPrototype$1(bValue) !== getPrototype$1(aValue)) {
-                diff = diff || {};
-                diff[aKey] = bValue;
-            } else if (isHook(bValue)) {
-                diff = diff || {};
-                diff[aKey] = bValue;
-            } else {
-                var objectDiff = diffProps(aValue, bValue);
-                if (objectDiff) {
-                    diff = diff || {};
-                    diff[aKey] = objectDiff;
-                }
-            }
-        } else {
-            diff = diff || {};
-            diff[aKey] = bValue;
-        }
-    }
-
-    for (var bKey in b) {
-        if (!(bKey in a)) {
-            diff = diff || {};
-            diff[bKey] = b[bKey];
-        }
-    }
-
-    return diff;
-}
-
-function getPrototype$1(value) {
-    if (Object.getPrototypeOf) {
-        return Object.getPrototypeOf(value);
-    } else if (value.__proto__) {
-        return value.__proto__;
-    } else if (value.constructor) {
-        return value.constructor.prototype;
-    }
-}
-
-function diff(a, b) {
-    var patch = { a: a };
-    walk(a, b, patch, 0);
-    return patch;
-}
-
-function walk(a, b, patch, index) {
-    if (a === b) {
-        return;
-    }
-
-    var apply = patch[index];
-    var applyClear = false;
-
-    if (isThunk(a) || isThunk(b)) {
-        thunks(a, b, patch, index);
-    } else if (b == null) {
-
-        // If a is a widget we will add a remove patch for it
-        // Otherwise any child widgets/hooks must be destroyed.
-        // This prevents adding two remove patches for a widget.
-        if (!isWidget(a)) {
-            clearState(a, patch, index);
-            apply = patch[index];
-        }
-
-        apply = appendPatch(apply, new VirtualPatch(VPatch.REMOVE, a, b));
-    } else if (isVirtualNode(b)) {
-        if (isVirtualNode(a)) {
-            if (a.tagName === b.tagName && a.namespace === b.namespace && a.key === b.key) {
-                var propsPatch = diffProps(a.properties, b.properties);
-                if (propsPatch) {
-                    apply = appendPatch(apply, new VirtualPatch(VPatch.PROPS, a, propsPatch));
-                }
-                apply = diffChildren(a, b, patch, apply, index);
-            } else {
-                apply = appendPatch(apply, new VirtualPatch(VPatch.VNODE, a, b));
-                applyClear = true;
-            }
-        } else {
-            apply = appendPatch(apply, new VirtualPatch(VPatch.VNODE, a, b));
-            applyClear = true;
-        }
-    } else if (isVirtualText(b)) {
-        if (!isVirtualText(a)) {
-            apply = appendPatch(apply, new VirtualPatch(VPatch.VTEXT, a, b));
-            applyClear = true;
-        } else if (a.text !== b.text) {
-            apply = appendPatch(apply, new VirtualPatch(VPatch.VTEXT, a, b));
-        }
-    } else if (isWidget(b)) {
-        if (!isWidget(a)) {
-            applyClear = true;
-        }
-
-        apply = appendPatch(apply, new VirtualPatch(VPatch.WIDGET, a, b));
-    }
-
-    if (apply) {
-        patch[index] = apply;
-    }
-
-    if (applyClear) {
-        clearState(a, patch, index);
-    }
-}
-
-function diffChildren(a, b, patch, apply, index) {
-    var aChildren = a.children;
-    var orderedSet = reorder(aChildren, b.children);
-    var bChildren = orderedSet.children;
-
-    var aLen = aChildren.length;
-    var bLen = bChildren.length;
-    var len = aLen > bLen ? aLen : bLen;
-
-    for (var i = 0; i < len; i++) {
-        var leftNode = aChildren[i];
-        var rightNode = bChildren[i];
-        index += 1;
-
-        if (!leftNode) {
-            if (rightNode) {
-                // Excess nodes in b need to be added
-                apply = appendPatch(apply, new VirtualPatch(VPatch.INSERT, null, rightNode));
-            }
-        } else {
-            walk(leftNode, rightNode, patch, index);
-        }
-
-        if (isVirtualNode(leftNode) && leftNode.count) {
-            index += leftNode.count;
-        }
-    }
-
-    if (orderedSet.moves) {
-        // Reorder nodes last
-        apply = appendPatch(apply, new VirtualPatch(VPatch.ORDER, a, orderedSet.moves));
-    }
-
-    return apply;
-}
-
-function clearState(vNode, patch, index) {
-    // TODO: Make this a single walk, not two
-    unhook(vNode, patch, index);
-    destroyWidgets(vNode, patch, index);
-}
-
-// Patch records for all destroyed widgets must be added because we need
-// a DOM node reference for the destroy function
-function destroyWidgets(vNode, patch, index) {
-    if (isWidget(vNode)) {
-        if (typeof vNode.destroy === "function") {
-            patch[index] = appendPatch(patch[index], new VirtualPatch(VPatch.REMOVE, vNode, null));
-        }
-    } else if (isVirtualNode(vNode) && (vNode.hasWidgets || vNode.hasThunks)) {
-        var children = vNode.children;
-        var len = children.length;
-        for (var i = 0; i < len; i++) {
-            var child = children[i];
-            index += 1;
-
-            destroyWidgets(child, patch, index);
-
-            if (isVirtualNode(child) && child.count) {
-                index += child.count;
-            }
-        }
-    } else if (isThunk(vNode)) {
-        thunks(vNode, null, patch, index);
-    }
-}
-
-// Create a sub-patch for thunks
-function thunks(a, b, patch, index) {
-    var nodes = handleThunk(a, b);
-    var thunkPatch = diff(nodes.a, nodes.b);
-    if (hasPatches(thunkPatch)) {
-        patch[index] = new VirtualPatch(VPatch.THUNK, null, thunkPatch);
-    }
-}
-
-function hasPatches(patch) {
-    for (var index in patch) {
-        if (index !== "a") {
-            return true;
-        }
-    }
-
+/**
+ * The base implementation of `_.isNative` without bad shim checks.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a native function,
+ *  else `false`.
+ */
+function baseIsNative(value) {
+  if (!isObject(value) || isMasked(value)) {
     return false;
+  }
+  var pattern = isFunction(value) ? reIsNative : reIsHostCtor;
+  return pattern.test(toSource(value));
 }
 
-// Execute hooks when two nodes are identical
-function unhook(vNode, patch, index) {
-    if (isVirtualNode(vNode)) {
-        if (vNode.hooks) {
-            patch[index] = appendPatch(patch[index], new VirtualPatch(VPatch.PROPS, vNode, undefinedKeys(vNode.hooks)));
-        }
-
-        if (vNode.descendantHooks || vNode.hasThunks) {
-            var children = vNode.children;
-            var len = children.length;
-            for (var i = 0; i < len; i++) {
-                var child = children[i];
-                index += 1;
-
-                unhook(child, patch, index);
-
-                if (isVirtualNode(child) && child.count) {
-                    index += child.count;
-                }
-            }
-        }
-    } else if (isThunk(vNode)) {
-        thunks(vNode, null, patch, index);
-    }
+/**
+ * Gets the value at `key` of `object`.
+ *
+ * @private
+ * @param {Object} [object] The object to query.
+ * @param {string} key The key of the property to get.
+ * @returns {*} Returns the property value.
+ */
+function getValue(object, key) {
+  return object == null ? undefined : object[key];
 }
 
-function undefinedKeys(obj) {
-    var result = {};
-
-    for (var key in obj) {
-        result[key] = undefined;
-    }
-
-    return result;
+/**
+ * Gets the native function at `key` of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {string} key The key of the method to get.
+ * @returns {*} Returns the function if it's native, else `undefined`.
+ */
+function getNative(object, key) {
+  var value = getValue(object, key);
+  return baseIsNative(value) ? value : undefined;
 }
 
-// List diff, naive left to right reordering
-function reorder(aChildren, bChildren) {
-    // O(M) time, O(M) memory
-    var bChildIndex = keyIndex(bChildren);
-    var bKeys = bChildIndex.keys;
-    var bFree = bChildIndex.free;
+/* Built-in method references that are verified to be native. */
+var DataView = getNative(root$1, 'DataView');
 
-    if (bFree.length === bChildren.length) {
-        return {
-            children: bChildren,
-            moves: null
-        };
-    }
+/* Built-in method references that are verified to be native. */
+var Map = getNative(root$1, 'Map');
 
-    // O(N) time, O(N) memory
-    var aChildIndex = keyIndex(aChildren);
-    var aKeys = aChildIndex.keys;
-    var aFree = aChildIndex.free;
+/* Built-in method references that are verified to be native. */
+var Promise = getNative(root$1, 'Promise');
 
-    if (aFree.length === aChildren.length) {
-        return {
-            children: bChildren,
-            moves: null
-        };
-    }
+/* Built-in method references that are verified to be native. */
+var Set = getNative(root$1, 'Set');
 
-    // O(MAX(N, M)) memory
-    var newChildren = [];
+/* Built-in method references that are verified to be native. */
+var WeakMap = getNative(root$1, 'WeakMap');
 
-    var freeIndex = 0;
-    var freeCount = bFree.length;
-    var deletedItems = 0;
+/** Used for built-in method references. */
+var objectProto$7 = Object.prototype;
 
-    // Iterate through a and match a node in b
-    // O(N) time,
-    for (var i = 0; i < aChildren.length; i++) {
-        var aItem = aChildren[i];
-        var itemIndex;
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var objectToString$3 = objectProto$7.toString;
 
-        if (aItem.key) {
-            if (bKeys.hasOwnProperty(aItem.key)) {
-                // Match up the old keys
-                itemIndex = bKeys[aItem.key];
-                newChildren.push(bChildren[itemIndex]);
-            } else {
-                // Remove old keyed items
-                itemIndex = i - deletedItems++;
-                newChildren.push(null);
+/**
+ * The base implementation of `getTag`.
+ *
+ * @private
+ * @param {*} value The value to query.
+ * @returns {string} Returns the `toStringTag`.
+ */
+function baseGetTag(value) {
+  return objectToString$3.call(value);
+}
+
+/** `Object#toString` result references. */
+var mapTag$1 = '[object Map]';
+var objectTag$1 = '[object Object]';
+var promiseTag = '[object Promise]';
+var setTag$1 = '[object Set]';
+var weakMapTag = '[object WeakMap]';
+
+var dataViewTag = '[object DataView]';
+
+/** Used for built-in method references. */
+var objectProto$4 = Object.prototype;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var objectToString$1 = objectProto$4.toString;
+
+/** Used to detect maps, sets, and weakmaps. */
+var dataViewCtorString = toSource(DataView);
+var mapCtorString = toSource(Map);
+var promiseCtorString = toSource(Promise);
+var setCtorString = toSource(Set);
+var weakMapCtorString = toSource(WeakMap);
+
+/**
+ * Gets the `toStringTag` of `value`.
+ *
+ * @private
+ * @param {*} value The value to query.
+ * @returns {string} Returns the `toStringTag`.
+ */
+var getTag = baseGetTag;
+
+// Fallback for data views, maps, sets, and weak maps in IE 11 and promises in Node.js < 6.
+if (DataView && getTag(new DataView(new ArrayBuffer(1))) != dataViewTag || Map && getTag(new Map()) != mapTag$1 || Promise && getTag(Promise.resolve()) != promiseTag || Set && getTag(new Set()) != setTag$1 || WeakMap && getTag(new WeakMap()) != weakMapTag) {
+    getTag = function (value) {
+        var result = objectToString$1.call(value),
+            Ctor = result == objectTag$1 ? value.constructor : undefined,
+            ctorString = Ctor ? toSource(Ctor) : undefined;
+
+        if (ctorString) {
+            switch (ctorString) {
+                case dataViewCtorString:
+                    return dataViewTag;
+                case mapCtorString:
+                    return mapTag$1;
+                case promiseCtorString:
+                    return promiseTag;
+                case setCtorString:
+                    return setTag$1;
+                case weakMapCtorString:
+                    return weakMapTag;
             }
-        } else {
-            // Match the item in a with the next free item in b
-            if (freeIndex < freeCount) {
-                itemIndex = bFree[freeIndex++];
-                newChildren.push(bChildren[itemIndex]);
-            } else {
-                // There are no free items in b to match with
-                // the free items in a, so the extra free nodes
-                // are deleted.
-                itemIndex = i - deletedItems++;
-                newChildren.push(null);
-            }
         }
-    }
-
-    var lastFreeIndex = freeIndex >= bFree.length ? bChildren.length : bFree[freeIndex];
-
-    // Iterate through b and append any new keys
-    // O(M) time
-    for (var j = 0; j < bChildren.length; j++) {
-        var newItem = bChildren[j];
-
-        if (newItem.key) {
-            if (!aKeys.hasOwnProperty(newItem.key)) {
-                // Add any new keyed items
-                // We are adding new items to the end and then sorting them
-                // in place. In future we should insert new items in place.
-                newChildren.push(newItem);
-            }
-        } else if (j >= lastFreeIndex) {
-            // Add any leftover non-keyed items
-            newChildren.push(newItem);
-        }
-    }
-
-    var simulate = newChildren.slice();
-    var simulateIndex = 0;
-    var removes = [];
-    var inserts = [];
-    var simulateItem;
-
-    for (var k = 0; k < bChildren.length;) {
-        var wantedItem = bChildren[k];
-        simulateItem = simulate[simulateIndex];
-
-        // remove items
-        while (simulateItem === null && simulate.length) {
-            removes.push(remove(simulate, simulateIndex, null));
-            simulateItem = simulate[simulateIndex];
-        }
-
-        if (!simulateItem || simulateItem.key !== wantedItem.key) {
-            // if we need a key in this position...
-            if (wantedItem.key) {
-                if (simulateItem && simulateItem.key) {
-                    // if an insert doesn't put this key in place, it needs to move
-                    if (bKeys[simulateItem.key] !== k + 1) {
-                        removes.push(remove(simulate, simulateIndex, simulateItem.key));
-                        simulateItem = simulate[simulateIndex];
-                        // if the remove didn't put the wanted item in place, we need to insert it
-                        if (!simulateItem || simulateItem.key !== wantedItem.key) {
-                            inserts.push({ key: wantedItem.key, to: k });
-                        }
-                        // items are matching, so skip ahead
-                        else {
-                                simulateIndex++;
-                            }
-                    } else {
-                        inserts.push({ key: wantedItem.key, to: k });
-                    }
-                } else {
-                    inserts.push({ key: wantedItem.key, to: k });
-                }
-                k++;
-            }
-            // a key in simulate has no matching wanted key, remove it
-            else if (simulateItem && simulateItem.key) {
-                    removes.push(remove(simulate, simulateIndex, simulateItem.key));
-                }
-        } else {
-            simulateIndex++;
-            k++;
-        }
-    }
-
-    // remove all the remaining nodes from simulate
-    while (simulateIndex < simulate.length) {
-        simulateItem = simulate[simulateIndex];
-        removes.push(remove(simulate, simulateIndex, simulateItem && simulateItem.key));
-    }
-
-    // If the only moves we have are deletes then we can just
-    // let the delete patch remove these items.
-    if (removes.length === deletedItems && !inserts.length) {
-        return {
-            children: newChildren,
-            moves: null
-        };
-    }
-
-    return {
-        children: newChildren,
-        moves: {
-            removes: removes,
-            inserts: inserts
-        }
+        return result;
     };
 }
 
-function remove(arr, index, key) {
-    arr.splice(index, 1);
+var getTag$1 = getTag;
 
-    return {
-        from: index,
-        key: key
-    };
+/** `Object#toString` result references. */
+var argsTag = '[object Arguments]';
+
+/** Used for built-in method references. */
+var objectProto$9 = Object.prototype;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var objectToString$4 = objectProto$9.toString;
+
+/**
+ * The base implementation of `_.isArguments`.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an `arguments` object,
+ */
+function baseIsArguments(value) {
+  return isObjectLike(value) && objectToString$4.call(value) == argsTag;
 }
 
-function keyIndex(children) {
-    var keys = {};
-    var free = [];
-    var length = children.length;
+/** Used for built-in method references. */
+var objectProto$8 = Object.prototype;
 
-    for (var i = 0; i < length; i++) {
-        var child = children[i];
+/** Used to check objects for own properties. */
+var hasOwnProperty$4 = objectProto$8.hasOwnProperty;
 
-        if (child.key) {
-            keys[child.key] = i;
-        } else {
-            free.push(i);
-        }
-    }
+/** Built-in value references. */
+var propertyIsEnumerable = objectProto$8.propertyIsEnumerable;
 
-    return {
-        keys: keys, // A hash of key name to index
-        free: free // An array of unkeyed item indices
-    };
-}
-
-function appendPatch(apply, patch) {
-    if (apply) {
-        if (isArray(apply)) {
-            apply.push(patch);
-        } else {
-            apply = [apply, patch];
-        }
-
-        return apply;
-    } else {
-        return patch;
-    }
-}
-
-function isArray(obj) {
-    return toString.call(obj) === "[object Array]";
-}
-
-function EvHook(value) {
-    if (!(this instanceof EvHook)) {
-        return new EvHook(value);
-    }
-
-    this.value = value;
-}
-
-EvHook.prototype.hook = function (node, propertyName) {
-    var es = EvStore(node);
-    var propName = propertyName.substr(3);
-
-    es[propName] = this.value;
+/**
+ * Checks if `value` is likely an `arguments` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an `arguments` object,
+ *  else `false`.
+ * @example
+ *
+ * _.isArguments(function() { return arguments; }());
+ * // => true
+ *
+ * _.isArguments([1, 2, 3]);
+ * // => false
+ */
+var isArguments = baseIsArguments(function () {
+  return arguments;
+}()) ? baseIsArguments : function (value) {
+  return isObjectLike(value) && hasOwnProperty$4.call(value, 'callee') && !propertyIsEnumerable.call(value, 'callee');
 };
 
-EvHook.prototype.unhook = function (node, propertyName) {
-    var es = EvStore(node);
-    var propName = propertyName.substr(3);
+/** Used as references for various `Number` constants. */
+var MAX_SAFE_INTEGER = 9007199254740991;
 
-    es[propName] = undefined;
+/**
+ * Checks if `value` is a valid array-like length.
+ *
+ * **Note:** This method is loosely based on
+ * [`ToLength`](http://ecma-international.org/ecma-262/7.0/#sec-tolength).
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a valid length, else `false`.
+ * @example
+ *
+ * _.isLength(3);
+ * // => true
+ *
+ * _.isLength(Number.MIN_VALUE);
+ * // => false
+ *
+ * _.isLength(Infinity);
+ * // => false
+ *
+ * _.isLength('3');
+ * // => false
+ */
+function isLength(value) {
+  return typeof value == 'number' && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
+}
+
+/**
+ * Checks if `value` is array-like. A value is considered array-like if it's
+ * not a function and has a `value.length` that's an integer greater than or
+ * equal to `0` and less than or equal to `Number.MAX_SAFE_INTEGER`.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
+ * @example
+ *
+ * _.isArrayLike([1, 2, 3]);
+ * // => true
+ *
+ * _.isArrayLike(document.body.children);
+ * // => true
+ *
+ * _.isArrayLike('abc');
+ * // => true
+ *
+ * _.isArrayLike(_.noop);
+ * // => false
+ */
+function isArrayLike(value) {
+  return value != null && isLength(value.length) && !isFunction(value);
+}
+
+/**
+ * This method returns `false`.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.13.0
+ * @category Util
+ * @returns {boolean} Returns `false`.
+ * @example
+ *
+ * _.times(2, _.stubFalse);
+ * // => [false, false]
+ */
+function stubFalse() {
+  return false;
+}
+
+/** Detect free variable `exports`. */
+var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
+
+/** Detect free variable `module`. */
+var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
+
+/** Detect the popular CommonJS extension `module.exports`. */
+var moduleExports = freeModule && freeModule.exports === freeExports;
+
+/** Built-in value references. */
+var Buffer = moduleExports ? root$1.Buffer : undefined;
+
+/* Built-in method references for those with the same name as other `lodash` methods. */
+var nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined;
+
+/**
+ * Checks if `value` is a buffer.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.3.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a buffer, else `false`.
+ * @example
+ *
+ * _.isBuffer(new Buffer(2));
+ * // => true
+ *
+ * _.isBuffer(new Uint8Array(2));
+ * // => false
+ */
+var isBuffer = nativeIsBuffer || stubFalse;
+
+/** `Object#toString` result references. */
+var argsTag$1 = '[object Arguments]';
+var arrayTag = '[object Array]';
+var boolTag = '[object Boolean]';
+var dateTag = '[object Date]';
+var errorTag = '[object Error]';
+var funcTag$1 = '[object Function]';
+var mapTag$2 = '[object Map]';
+var numberTag = '[object Number]';
+var objectTag$2 = '[object Object]';
+var regexpTag = '[object RegExp]';
+var setTag$2 = '[object Set]';
+var stringTag = '[object String]';
+var weakMapTag$1 = '[object WeakMap]';
+
+var arrayBufferTag = '[object ArrayBuffer]';
+var dataViewTag$1 = '[object DataView]';
+var float32Tag = '[object Float32Array]';
+var float64Tag = '[object Float64Array]';
+var int8Tag = '[object Int8Array]';
+var int16Tag = '[object Int16Array]';
+var int32Tag = '[object Int32Array]';
+var uint8Tag = '[object Uint8Array]';
+var uint8ClampedTag = '[object Uint8ClampedArray]';
+var uint16Tag = '[object Uint16Array]';
+var uint32Tag = '[object Uint32Array]';
+
+/** Used to identify `toStringTag` values of typed arrays. */
+var typedArrayTags = {};
+typedArrayTags[float32Tag] = typedArrayTags[float64Tag] = typedArrayTags[int8Tag] = typedArrayTags[int16Tag] = typedArrayTags[int32Tag] = typedArrayTags[uint8Tag] = typedArrayTags[uint8ClampedTag] = typedArrayTags[uint16Tag] = typedArrayTags[uint32Tag] = true;
+typedArrayTags[argsTag$1] = typedArrayTags[arrayTag] = typedArrayTags[arrayBufferTag] = typedArrayTags[boolTag] = typedArrayTags[dataViewTag$1] = typedArrayTags[dateTag] = typedArrayTags[errorTag] = typedArrayTags[funcTag$1] = typedArrayTags[mapTag$2] = typedArrayTags[numberTag] = typedArrayTags[objectTag$2] = typedArrayTags[regexpTag] = typedArrayTags[setTag$2] = typedArrayTags[stringTag] = typedArrayTags[weakMapTag$1] = false;
+
+/** Used for built-in method references. */
+var objectProto$10 = Object.prototype;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var objectToString$5 = objectProto$10.toString;
+
+/**
+ * The base implementation of `_.isTypedArray` without Node.js optimizations.
+ *
+ * @private
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a typed array, else `false`.
+ */
+function baseIsTypedArray(value) {
+    return isObjectLike(value) && isLength(value.length) && !!typedArrayTags[objectToString$5.call(value)];
+}
+
+/**
+ * The base implementation of `_.unary` without support for storing metadata.
+ *
+ * @private
+ * @param {Function} func The function to cap arguments for.
+ * @returns {Function} Returns the new capped function.
+ */
+function baseUnary(func) {
+  return function (value) {
+    return func(value);
+  };
+}
+
+/** Detect free variable `exports`. */
+var freeExports$1 = typeof exports == 'object' && exports && !exports.nodeType && exports;
+
+/** Detect free variable `module`. */
+var freeModule$1 = freeExports$1 && typeof module == 'object' && module && !module.nodeType && module;
+
+/** Detect the popular CommonJS extension `module.exports`. */
+var moduleExports$1 = freeModule$1 && freeModule$1.exports === freeExports$1;
+
+/** Detect free variable `process` from Node.js. */
+var freeProcess = moduleExports$1 && freeGlobal.process;
+
+/** Used to access faster Node.js helpers. */
+var nodeUtil = function () {
+  try {
+    return freeProcess && freeProcess.binding('util');
+  } catch (e) {}
+}();
+
+/* Node.js helper references. */
+var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
+
+/**
+ * Checks if `value` is classified as a typed array.
+ *
+ * @static
+ * @memberOf _
+ * @since 3.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a typed array, else `false`.
+ * @example
+ *
+ * _.isTypedArray(new Uint8Array);
+ * // => true
+ *
+ * _.isTypedArray([]);
+ * // => false
+ */
+var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedArray;
+
+/** `Object#toString` result references. */
+var mapTag = '[object Map]';
+var setTag = '[object Set]';
+
+/** Used for built-in method references. */
+var objectProto$1 = Object.prototype;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty$1 = objectProto$1.hasOwnProperty;
+
+/**
+ * Checks if `value` is an empty object, collection, map, or set.
+ *
+ * Objects are considered empty if they have no own enumerable string keyed
+ * properties.
+ *
+ * Array-like values such as `arguments` objects, arrays, buffers, strings, or
+ * jQuery-like collections are considered empty if they have a `length` of `0`.
+ * Similarly, maps and sets are considered empty if they have a `size` of `0`.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is empty, else `false`.
+ * @example
+ *
+ * _.isEmpty(null);
+ * // => true
+ *
+ * _.isEmpty(true);
+ * // => true
+ *
+ * _.isEmpty(1);
+ * // => true
+ *
+ * _.isEmpty([1, 2, 3]);
+ * // => false
+ *
+ * _.isEmpty({ 'a': 1 });
+ * // => false
+ */
+function isEmpty(value) {
+  if (isArrayLike(value) && (isArray(value) || typeof value == 'string' || typeof value.splice == 'function' || isBuffer(value) || isTypedArray(value) || isArguments(value))) {
+    return !value.length;
+  }
+  var tag = getTag$1(value);
+  if (tag == mapTag || tag == setTag) {
+    return !value.size;
+  }
+  if (isPrototype(value)) {
+    return !baseKeys(value).length;
+  }
+  for (var key in value) {
+    if (hasOwnProperty$1.call(value, key)) {
+      return false;
+    }
+  }
+  return true;
+}
+
+const version = 2;
+
+const isVirtualText = x => {
+	return x && x.type === "VirtualText" && x.version === version;
 };
 
-function assembly(tagName) {
+const isThunk = t => {
+	return t && t.type === "Thunk";
+};
+
+const isHook = hook => {
+	return hook && (typeof hook.hook === "function" && !hook.hasOwnProperty("hook") || typeof hook.unhook === "function" && !hook.hasOwnProperty("unhook"));
+};
+
+const isVirtualNode = x => {
+	return x && x.type === "VirtualNode" && x.version === version;
+};
+
+const isWidget = w => {
+	return w && w.type === "Widget";
+};
+
+const isChild = x => {
+	return isVirtualNode(x) || isVirtualText(x) || isWidget(x) || isThunk(x);
+};
+
+function VirtualNode(tagName, properties, children, key, namespace) {
+    this.tagName = tagName;
+    this.properties = properties || {};
+    this.children = children || [];
+    this.key = key != null ? key + '' : undefined;
+    this.namespace = typeof namespace === "string" ? namespace : null;
+
+    const count = children && children.length || 0;
+    let descendants = 0;
+    let hasWidgets = false;
+    let hasThunks = false;
+    let descendantHooks = false;
+    let hooks;
+    let propName;
+    let property;
+    let i;
+    let child;
+
+    for (propName in properties) {
+        if (properties.hasOwnProperty(propName)) {
+            property = properties[propName];
+            if (isHook(property) && property.unhook) {
+                if (!hooks) {
+                    hooks = {};
+                }
+
+                hooks[propName] = property;
+            }
+        }
+    }
+
+    for (i = 0; i < count; i++) {
+        child = children[i];
+        if (isVirtualNode(child)) {
+            descendants += child.count || 0;
+
+            if (!hasWidgets && child.hasWidgets) {
+                hasWidgets = true;
+            }
+
+            if (!hasThunks && child.hasThunks) {
+                hasThunks = true;
+            }
+
+            if (!descendantHooks && (child.hooks || child.descendantHooks)) {
+                descendantHooks = true;
+            }
+        } else if (!hasWidgets && isWidget(child)) {
+            if (typeof child.destroy === "function") {
+                hasWidgets = true;
+            }
+        } else if (!hasThunks && isThunk(child)) {
+            hasThunks = true;
+        }
+    }
+
+    this.count = count + descendants;
+    this.hasWidgets = hasWidgets;
+    this.hasThunks = hasThunks;
+    this.hooks = hooks;
+    this.descendantHooks = descendantHooks;
+}
+
+function VirtualText(text) {
+    this.text = text + '';
+}
+
+VirtualNode.prototype.version = version;
+VirtualNode.prototype.type = "VirtualNode";
+VirtualText.prototype.version = version;
+VirtualText.prototype.type = "VirtualText";
+
+function UnexpectedVirtualElement(data) {
+    var err = new Error();
+
+    err.type = 'virtual-hyperscript.unexpected.virtual-element';
+    err.message = 'Unexpected virtual child passed to h().\n' + 'Expected a VNode / Vthunk / VWidget / string but:\n' + 'got:\n' + errorString(data.foreignObject) + '.\n' + 'The parent vnode is:\n' + errorString(data.parentVnode);
+    '\n' + 'Suggested fix: change your `h(..., [ ... ])` callsite.';
+    err.foreignObject = data.foreignObject;
+    err.parentVnode = data.parentVnode;
+
+    return err;
+}
+
+function UnsupportedValueType(data) {
+    var err = new Error();
+
+    err.type = 'virtual-hyperscript.unsupported.value-type';
+    err.message = 'Unexpected value type for input passed to h().\n' + 'Expected a ' + errorString(data.expected) + ' but got:\n' + errorString(data.received) + '.\n' + 'The vnode is:\n' + errorString(data.Vnode);
+    '\n' + 'Suggested fix: Cast the value passed to h() to a string using String(value).';
+    err.Vnode = data.Vnode;
+
+    return err;
+}
+
+function errorString(obj) {
+    try {
+        return JSON.stringify(obj, null, '    ');
+    } catch (e) {
+        return String(obj);
+    }
+}
+
+const transformProperties = props => {
+
+    for (var propName in props) {
+        if (props.hasOwnProperty(propName)) {
+            var value = props[propName];
+            if (isHook(value)) {
+                continue;
+            }
+            if (propName.substr(0, 3) === 'ev-') {
+                props[propName] = eventHook(value);
+            }
+        }
+    }
+};
+
+const assembly = tagName => {
 
     return function (...args) {
-        var childNodes = [];
-        var children = [];
-        var tag, props, key, namespace;
-        var item;
+        let childNodes = [];
+        let children = [];
+        let props;
+        let key;
+        let namespace;
+        let item;
+        let i;
 
-        for (let i = 0; i < args.length; i++) {
+        for (i = 0; i < args.length; i++) {
             item = args[i];
 
             //Check if text node
-            if (typeof item === 'string') {
+            if (typeof item === 'string' || typeof item === 'number') {
                 children.push(item);
             } else if (item.hasOwnProperty('descendantHooks')) {
                 children.push(item);
-            } else if (item.constructor === {}.constructor) {
+            } else if (isPlainObject(item)) {
                 props = item;
             }
 
@@ -965,173 +1068,180 @@ function assembly(tagName) {
             }
             props.value = softSetHook(props.value);
         }
-
-        transformProperties(props);
-
-        if (children !== undefined && children !== null) {
-            addChild(children, childNodes, tagName, props);
+        if (!isEmpty(props)) {
+            transformProperties(props);
         }
 
-        // console.log(tag, props, childNodes, key, namespace)
-        props.isProp = true;
-
+        addChild(children, childNodes, tagName, props);
         return new VirtualNode(tagName, props, childNodes, key, namespace);
     };
-}
+};
 
-function addChild(c, childNodes, tag, props) {
-    console.log(isChild(c));
-    if (typeof c === 'string') {
-        childNodes.push(new VirtualText(c));
-    } else if (typeof c === 'number') {
-        childNodes.push(new VirtualText(String(c)));
-    } else if (isChild(c)) {
-        childNodes.push(c);
-    } else if (isArray(c)) {
-        for (var i = 0; i < c.length; i++) {
-            addChild(c[i], childNodes, tag, props);
+const addChild = (child, childNodes, tag, props) => {
+
+    if (typeof child === 'string' || typeof child === 'number') {
+        childNodes.push(new VirtualText(child));
+    } else if (isChild(child)) {
+        childNodes.push(child);
+    } else if (isArray(child)) {
+        for (var i = 0; i < child.length; i++) {
+            addChild(child[i], childNodes, tag, props);
         }
-    } else if (c === null || c === undefined) {
+    } else if (child === null || child === undefined) {
         return;
     } else {
         throw UnexpectedVirtualElement({
-            foreignObject: c,
+            foreignObject: child,
             parentVnode: {
                 tagName: tag,
                 properties: props
             }
         });
     }
-}
+};
 
-function transformProperties(props) {
-    for (var propName in props) {
-        if (props.hasOwnProperty(propName)) {
-            var value = props[propName];
+const handleThunk = (a, b) => {
+    return {
+        a: isThunk(a) ? renderThunk(a, null) : a,
+        b: isThunk(b) ? renderThunk(b, a) : b
+    };
+};
 
-            if (isHook(value)) {
-                continue;
+const applyProperties = (node, props, previous) => {
+    let propName;
+    let propValue;
+
+    for (propName in props) {
+        propValue = props[propName];
+
+        if (propValue === undefined) {
+            removeProperty(node, propName, propValue, previous);
+        } else if (isHook(propValue)) {
+            removeProperty(node, propName, propValue, previous);
+            if (propValue.hook) {
+                propValue.hook(node, propName, previous ? previous[propName] : undefined);
             }
-
-            if (propName.substr(0, 3) === 'ev-') {
-                // add ev-foo support
-                props[propName] = evHook(value);
+        } else {
+            if (isPlainObject(propValue)) {
+                patchObject(node, props, previous, propName, propValue);
+            } else {
+                node[propName] = propValue;
             }
         }
     }
-}
+};
 
-function isChild(x) {
-    console.log(isVirtualNode(x), isVirtualText(x), isWidget(x), isThunk(x));
-    return isVirtualNode(x) || isVirtualText(x) || isWidget(x) || isThunk(x);
-}
+function create(virtualNode, opts) {
+    const doc = opts ? opts.document || document : document;
+    const warn = opts ? opts.warn : null;
+    let i;
+    let node;
+    let children;
+    let childNode;
+    let vnode = virtualNode;
 
-function UnexpectedVirtualElement(data) {
-    var err = new Error();
+    vnode = handleThunk(virtualNode).a;
 
-    err.type = 'virtual-hyperscript.unexpected.virtual-element';
-    err.message = 'Unexpected virtual child passed to h().\n' + 'Expected a VNode / Vthunk / VWidget / string but:\n' + 'got:\n' + errorString(data.foreignObject) + '.\n' + 'The parent vnode is:\n' + errorString(data.parentVnode);
-    '\n' + 'Suggested fix: change your `h(..., [ ... ])` callsite.';
-    err.foreignObject = data.foreignObject;
-    err.parentVnode = data.parentVnode;
-
-    return err;
-}
-
-function UnsupportedValueType(data) {
-    var err = new Error();
-
-    err.type = 'virtual-hyperscript.unsupported.value-type';
-    err.message = 'Unexpected value type for input passed to h().\n' + 'Expected a ' + errorString(data.expected) + ' but got:\n' + errorString(data.received) + '.\n' + 'The vnode is:\n' + errorString(data.Vnode);
-    '\n' + 'Suggested fix: Cast the value passed to h() to a string using String(value).';
-    err.Vnode = data.Vnode;
-
-    return err;
-}
-
-function errorString(obj) {
-    try {
-        return JSON.stringify(obj, null, '    ');
-    } catch (e) {
-        return String(obj);
+    if (isWidget(vnode)) {
+        return vnode.init();
+    } else if (isVirtualText(vnode)) {
+        return doc.createTextNode(vnode.text);
+    } else if (!isVirtualNode(vnode)) {
+        if (warn) {
+            warn("Item is not a valid virtual dom node", vnode);
+        }
+        return null;
     }
+
+    if (vnode.namespace === null) {
+        node = doc.createElement(vnode.tagName);
+    } else {
+        node = doc.createElementNS(vnode.namespace, vnode.tagName);
+    }
+
+    applyProperties(node, vnode.properties);
+
+    children = vnode.children;
+
+    for (i = 0; i < children.length; i++) {
+        childNode = create(children[i], opts);
+        if (childNode) {
+            node.appendChild(childNode);
+        }
+    }
+
+    return node;
 }
 
-var classIdSplit = /([\.#]?[a-zA-Z0-9\u007F-\uFFFF_:-]+)/;
-var noProperties = {};
-var noChildren = [];
+const patchObject = (node, props, previous, propName, propValue) => {
+    let previousValue = previous ? previous[propName] : undefined;
+    let attrValue;
+    let attrName;
+    let replacer;
+    let k;
+    let value;
 
-function VirtualNode(tagName, properties, children, key, namespace) {
-    this.tagName = tagName;
-    this.properties = properties || noProperties;
-    this.children = children || noChildren;
-    this.key = key != null ? String(key) : undefined;
-    this.namespace = typeof namespace === "string" ? namespace : null;
+    // Set attributes
+    if (propName === "attributes") {
 
-    var count = children && children.length || 0;
-    var descendants = 0;
-    var hasWidgets = false;
-    var hasThunks = false;
-    var descendantHooks = false;
-    var hooks;
+        for (attrName in propValue) {
+            attrValue = propValue[attrName];
 
-    for (var propName in properties) {
-        if (properties.hasOwnProperty(propName)) {
-            var property = properties[propName];
-            if (isHook(property) && property.unhook) {
-                if (!hooks) {
-                    hooks = {};
+            if (attrValue === undefined) {
+                node.removeAttribute(attrName);
+            } else {
+                node.setAttribute(attrName, attrValue);
+            }
+        }
+
+        return;
+    }
+
+    // TODO, check how style is being handled.
+
+    // console.log(node, propName, propValue)
+    //  if (previousValue && isPlainObject(previousValue) &&
+    //      getPrototype(previousValue) !== getPrototype(propValue)) {
+    //      console.log(node, popName, propValue)
+    //      node[propName] = propValue;
+    //      return;
+    //  }
+
+    if (!isPlainObject(node[propName])) {
+        node[propName] = {};
+    }
+
+    replacer = propName === "style" ? "" : undefined;
+
+    for (k in propValue) {
+        value = propValue[k];
+        node[propName][k] = value === undefined ? replacer : value;
+    }
+};
+
+const removeProperty = (node, propName, propValue, previous) => {
+    if (previous) {
+        const previousValue = previous[propName];
+
+        if (!isHook(previousValue)) {
+            if (propName === "attributes") {
+                for (var attrName in previousValue) {
+                    node.removeAttribute(attrName);
                 }
-
-                hooks[propName] = property;
+            } else if (propName === "style") {
+                for (var i in previousValue) {
+                    node.style[i] = "";
+                }
+            } else if (typeof previousValue === "string") {
+                node[propName] = "";
+            } else {
+                node[propName] = null;
             }
+        } else if (previousValue.unhook) {
+            previousValue.unhook(node, propName, propValue);
         }
     }
-
-    for (var i = 0; i < count; i++) {
-        var child = children[i];
-        if (isVirtualNode(child)) {
-            descendants += child.count || 0;
-
-            if (!hasWidgets && child.hasWidgets) {
-                hasWidgets = true;
-            }
-
-            if (!hasThunks && child.hasThunks) {
-                hasThunks = true;
-            }
-
-            if (!descendantHooks && (child.hooks || child.descendantHooks)) {
-                descendantHooks = true;
-            }
-        } else if (!hasWidgets && isWidget(child)) {
-            if (typeof child.destroy === "function") {
-                hasWidgets = true;
-            }
-        } else if (!hasThunks && isThunk(child)) {
-            hasThunks = true;
-        }
-    }
-
-    this.count = count + descendants;
-    this.hasWidgets = hasWidgets;
-    this.hasThunks = hasThunks;
-    this.hooks = hooks;
-    this.descendantHooks = descendantHooks;
-}
-
-VirtualNode.prototype.version = version;
-VirtualNode.prototype.type = "VirtualNode";
-
-function VirtualText(text) {
-    this.text = String(text);
-}
-
-VirtualText.prototype.version = version;
-VirtualText.prototype.type = "VirtualText";
-
-///////////////////////////////
-
+};
 
 const a = assembly('a');
 const abbr = assembly('abbr');
@@ -1233,106 +1343,7 @@ const ul = assembly('ul');
 const v = assembly('var');
 const video = assembly('video');
 
-exports.a = a;
-exports.abbr = abbr;
-exports.address = address;
-exports.area = area;
-exports.article = article;
-exports.aside = aside;
-exports.audio = audio;
-exports.b = b;
-exports.base = base;
-exports.bdi = bdi;
-exports.bdo = bdo;
-exports.blockquote = blockquote;
-exports.body = body;
-exports.br = br;
-exports.button = button;
-exports.canvas = canvas;
-exports.caption = caption;
-exports.cite = cite;
-exports.code = code;
-exports.col = col;
-exports.colgroup = colgroup;
-exports.command = command;
-exports.dd = dd;
-exports.del = del;
-exports.dfn = dfn;
-exports.div = div;
-exports.dl = dl;
-exports.doctype = doctype;
-exports.dt = dt;
-exports.em = em;
-exports.embed = embed;
-exports.fieldset = fieldset;
-exports.figcaption = figcaption;
-exports.figure = figure;
-exports.footer = footer;
-exports.form = form;
-exports.h1 = h1;
-exports.h2 = h2;
-exports.h3 = h3;
-exports.h4 = h4;
-exports.h5 = h5;
-exports.h6 = h6;
-exports.header = header;
-exports.hgroup = hgroup;
-exports.hr = hr;
-exports.html = html;
-exports.i = i;
-exports.iframe = iframe;
-exports.img = img;
-exports.input = input;
-exports.ins = ins;
-exports.kbd = kbd;
-exports.keygen = keygen;
-exports.label = label;
-exports.legend = legend;
-exports.li = li;
-exports.link = link;
-exports.map = map;
-exports.mark = mark;
-exports.menu = menu;
-exports.meta = meta;
-exports.nav = nav;
-exports.noscript = noscript;
-exports.object = object;
-exports.ol = ol;
-exports.optgroup = optgroup;
-exports.option = option;
-exports.p = p;
-exports.param = param;
-exports.pre = pre;
-exports.progress = progress;
-exports.q = q;
-exports.rp = rp;
-exports.rt = rt;
-exports.ruby = ruby;
-exports.s = s;
-exports.samp = samp;
-exports.script = script;
-exports.section = section;
-exports.select = select;
-exports.small = small;
-exports.source = source;
-exports.span = span;
-exports.strong = strong;
-exports.style = style;
-exports.sub = sub;
-exports.sup = sup;
-exports.table = table;
-exports.tbody = tbody;
-exports.td = td;
-exports.textarea = textarea;
-exports.tfoot = tfoot;
-exports.th = th;
-exports.thead = thead;
-exports.title = title;
-exports.tr = tr;
-exports.ul = ul;
-exports.v = v;
-exports.video = video;
+// Create API
+const createNodes = create;
 
-Object.defineProperty(exports, '__esModule', { value: true });
-
-})));
+export { a, abbr, address, area, article, aside, audio, b, base, bdi, bdo, blockquote, body, br, button, canvas, caption, cite, code, col, colgroup, command, dd, del, dfn, div, dl, doctype, dt, em, embed, fieldset, figcaption, figure, footer, form, h1, h2, h3, h4, h5, h6, header, hgroup, hr, html, i, iframe, img, input, ins, kbd, keygen, label, legend, li, link, map, mark, menu, meta, nav, noscript, object, ol, optgroup, option, p, param, pre, progress, q, rp, rt, ruby, s, samp, script, section, select, small, source, span, strong, style, sub, sup, table, tbody, td, textarea, tfoot, th, thead, title, tr, ul, v, video, createNodes };
