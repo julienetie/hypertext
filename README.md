@@ -4,16 +4,24 @@ Create [virtual-dom](https://github.com/Matt-Esch/virtual-dom)'s [virtual-hypers
 
 
 ```php
-**NOT YET IMPLEMENTED**
+**ALPHA**
+  (Current Bug when using virtual-dom's createElement)
 ```
 
 
 ## What you need to know:
 #### **1**) _hypertext_ requires ES6 or CJS
 
-&nbsp;&nbsp;&nbsp;&nbsp;<sup>You can immediately demo using **```npm run play```** tweak **```./playground.js```** then check port **`9966`**</sup>
+&nbsp;&nbsp;&nbsp;&nbsp;<sup>Demo using **```npm run play```** tweak **```./playground.js```** then check port **`9966`**</sup>
 
 &nbsp;&nbsp;&nbsp;&nbsp;<sup>To demo via ES5 use **```./dist/hypertext-not-for-production.min.js```** all tags will miserably be global.</sup>
+
+- &nbsp;&nbsp;&nbsp;&nbsp;<sup>```npm i --save hypertext``` : Install</sup>
+- &nbsp;&nbsp;&nbsp;&nbsp;<sup>```npm run play``` : Host playground.js on port 9966</sup>
+- &nbsp;&nbsp;&nbsp;&nbsp;<sup>```npm run build``` : Builds es6 & cjs</sup>
+- &nbsp;&nbsp;&nbsp;&nbsp;<sup>```npm run global``` : Builds not-for-production.min.js</sup>
+- &nbsp;&nbsp;&nbsp;&nbsp;<sup>```npm run all``` : Builds all</sup>
+- &nbsp;&nbsp;&nbsp;&nbsp;<sup>```npm run watch``` : Build and watch src</sup>
 
 #### **2**) Import as you need
 ```javascript 
@@ -101,9 +109,9 @@ There's a few good reasons to use _hypertext_
 - hypertext is valid JavaScript.
 - Only supports valid HTML tags (Custom HTML pending).
 - Supports condtitions and easy to use iterations (loop() fn pending).
-- The syntax is "arguably" more readable than HTML: ```</closingTag>``` === ```)```.
+- For some, the syntax may be more readable than markup: ```</closingTag>``` === ```)```.
 - Has no dependencies, but obviously requires a virtual DOM if you care about repaint/ reflow (You should).
-- **_hypertext_** aims to be virtual-dom agnostic (_e.g. React, Vue 2.0, incremental dom support_) as "most" of 
+- **_hypertext_** hopes to one day be virtual-dom agnostic (_e.g. React, Vue 2.0, incremental dom support_) as "most" of 
 the differences between various virtual dom libraries do not warrant complete re-implementations of hypertext.
 
 #### **5**) Thanks
