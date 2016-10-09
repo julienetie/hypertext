@@ -865,7 +865,7 @@ function isEmpty(value) {
   return true;
 }
 
-const version = 2;
+const version = '2';
 
 const isVirtualText = x => {
 	return x && x.type === "VirtualText" && x.version === version;
@@ -1268,7 +1268,7 @@ const command = assembly('command');
 const dd = assembly('dd');
 const del = assembly('del');
 const dfn = assembly('dfn');
-const div = assembly('div');
+const div = assembly('DIV');
 const dl = assembly('dl');
 const doctype = assembly('doctype');
 const dt = assembly('dt');
