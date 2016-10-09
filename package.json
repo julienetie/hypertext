@@ -33,6 +33,7 @@
     "rollup-plugin-babel": "^2.6.1",
     "rollup-plugin-uglify": "^1.0.1",
     "rollup-watch": "^2.5.0",
+    "virtual-dom": "^2.1.1",
     "wtch": "^4.0.1",
     "wzrd": "^1.4.0"
   },
