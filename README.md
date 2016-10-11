@@ -16,11 +16,13 @@ See [Hypertext with ES6, ES5, CommonJS, AMD & globals](https://github.com/julien
 &nbsp;&nbsp;&nbsp;&nbsp;To demo via ES5 use **```./dist/hypertext-not-for-production.min.js```** all tags will miserably be global.
 
 - &nbsp;&nbsp;&nbsp;&nbsp;```npm i --save hypertext``` : Install **Not yet on npm, git clone for now**
+
+- &nbsp;&nbsp;&nbsp;&nbsp;```npm run es``` : Builds hypertext.es.js
+- &nbsp;&nbsp;&nbsp;&nbsp;```npm run umd``` : Builds hypertext.js
+- &nbsp;&nbsp;&nbsp;&nbsp;```npm run globals``` : Builds not-for-production.min.js
+- &nbsp;&nbsp;&nbsp;&nbsp;```npm run all``` : Builds all distributions
+- &nbsp;&nbsp;&nbsp;&nbsp;```npm run watch``` : Build and watch src for es
 - &nbsp;&nbsp;&nbsp;&nbsp;```npm run play``` : Host playground.js on port 9966
-- &nbsp;&nbsp;&nbsp;&nbsp;```npm run build``` : Builds es6 & cjs
-- &nbsp;&nbsp;&nbsp;&nbsp;```npm run global``` : Builds not-for-production.min.js
-- &nbsp;&nbsp;&nbsp;&nbsp;```npm run all``` : Builds all
-- &nbsp;&nbsp;&nbsp;&nbsp;```npm run watch``` : Build and watch src
 
 #### **2**) Import as you need
 ```javascript 
