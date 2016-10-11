@@ -1,6 +1,6 @@
 {
   "name": "hypertext",
-  "version": "0.0.1",
+  "version": "0.1.2",
   "description": "Create [virtual-dom](https://github.com/Matt-Esch/virtual-dom)'s [virtual-hyperscript](https://github.com/Raynos/virtual-hyperscript) **VTrees** or **DOM elements** using **_hypertext_**",
   "main": "dist/hypertext.js",
   "jsnext:main": "dist/hypertext.es.js",
