@@ -1,7 +1,7 @@
 import { SoftSetHook, eventHook } from './ev-store';
-import isPlainObject from '../node_modules/lodash-es/isPlainObject';
-import isArray from '../node_modules/lodash-es/isArray';
-import isEmpty from '../node_modules/lodash-es/isEmpty';
+import isPlainObject from 'lodash-es/isPlainObject';
+import isArray from 'lodash-es/isArray';
+import isEmpty  from 'lodash-es/isEmpty';
 import { VirtualNode, VirtualText } from './virtual-node';
 import version from './version';
 import { UnexpectedVirtualElement, UnsupportedValueType, errorString } from './validation';
@@ -104,7 +104,7 @@ const assembly = (tagName) => {
     };
 }
 
-    
+
 
 const addChild = (child, childNodes, tag, props) => {
 

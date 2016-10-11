@@ -13,7 +13,7 @@
  * 
  * or require the exported object.
  */
-var fn = require('./dist/hypertext-cjs');
+var fn = require('./dist/hypertext.cjs.js');
 Object.assign(window,fn) // This is bad
 
 
