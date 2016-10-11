@@ -11,9 +11,10 @@ Create [virtual-dom](https://github.com/Matt-Esch/virtual-dom)'s [virtual-hypers
 ## What you need to know:
 #### **1**) _hypertext_ is written in ES6, can be used in any workflow.
 See [Hypertext with ES6, ES5, CommonJS, AMD & globals](https://github.com/julienetie/hypertext/wiki/Hypertext-with-ES6,-ES5,-CommonJS,-AMD-&-globals)
-&nbsp;&nbsp;&nbsp;&nbspDemo using **```npm run play```** tweak **```./playground.js```** then check port **`9966`**
 
-&nbsp;&nbsp;&nbsp;&nbsp;To demo via ES5 use **```./dist/hypertext-not-for-production.min.js```** all tags will miserably be global.
+&nbsp;&nbsp;&nbsp;&nbsp;Demo using **```npm run play```** tweak **```./playground.js```** then check port **`9966`**
+
+&nbsp;&nbsp;&nbsp;&nbsp;Quick demo src**```./dist/hypertext-not-for-production.min.js```** all tags will miserably be global.
 
 - &nbsp;&nbsp;&nbsp;&nbsp;```npm i --save hypertext``` : Install **Not yet on npm, git clone for now**
 - &nbsp;&nbsp;&nbsp;&nbsp;```npm run build``` : Builds all distributions
