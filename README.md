@@ -16,12 +16,7 @@ See [Hypertext with ES6, ES5, CommonJS, AMD & globals](https://github.com/julien
 &nbsp;&nbsp;&nbsp;&nbsp;To demo via ES5 use **```./dist/hypertext-not-for-production.min.js```** all tags will miserably be global.
 
 - &nbsp;&nbsp;&nbsp;&nbsp;```npm i --save hypertext``` : Install **Not yet on npm, git clone for now**
-
-- &nbsp;&nbsp;&nbsp;&nbsp;```npm run es``` : Builds hypertext.es.js
-- &nbsp;&nbsp;&nbsp;&nbsp;```npm run umd``` : Builds hypertext.js
-- &nbsp;&nbsp;&nbsp;&nbsp;```npm run globals``` : Builds not-for-production.min.js
-- &nbsp;&nbsp;&nbsp;&nbsp;```npm run all``` : Builds all distributions
-- &nbsp;&nbsp;&nbsp;&nbsp;```npm run watch``` : Build and watch src for es
+- &nbsp;&nbsp;&nbsp;&nbsp;```npm run build``` : Builds all distributions
 - &nbsp;&nbsp;&nbsp;&nbsp;```npm run play``` : Host playground.js on port 9966
 
 #### **2**) Import as you need
@@ -115,7 +110,16 @@ There's a few good reasons to use _hypertext_
 - **_hypertext_** hopes to one day be virtual-dom agnostic (_e.g. React, Vue 2.0, incremental dom support_) as "most" of 
 the differences between various virtual dom libraries do not warrant complete re-implementations of hypertext.
 
-#### **5**) Thanks
+
+#### **6**) Contribute
+
+- &nbsp;&nbsp;&nbsp;&nbsp;```npm run es``` : Builds hypertext.es.js
+- &nbsp;&nbsp;&nbsp;&nbsp;```npm run umd``` : Builds hypertext.js
+- &nbsp;&nbsp;&nbsp;&nbsp;```npm run globals``` : Builds not-for-production.min.js
+- &nbsp;&nbsp;&nbsp;&nbsp;```npm run watch``` : Build and watch src for es
+
+
+#### **7**) Thanks
 
 To Matt Esch and Jake Verbaten for creating a bunch of cool libraries and modules that made hypertext feasible.
 
