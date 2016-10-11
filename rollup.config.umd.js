@@ -16,6 +16,6 @@ export default {
             main: true
         })
     ],
-    format: 'cjs',
+    format: 'umd',
     dest: 'dist/hypertext.js'
 };
