@@ -27,10 +27,9 @@ import { div, ul, li, a, header, footer, article, section, aside, h1, h3} from '
 #### **3**) Case: Create HTML elements without a virtual-dom
 ```javascript 
 
-import { createNodeTree, div, h1, p, figure, figcaption, img } from 'hypertext';
+import { createNodes, div, h1, p, figure, figcaption, img } from 'hypertext';
 
-const helloWorld =
-	createHTML(
+const helloWorldTree =
 		div({ class: 'hello', id: 'world' },
 			h1('Hello World!'),
 			p('How are you?'),
@@ -39,9 +38,10 @@ const helloWorld =
 				img({ alt: 'Maltese Terrier', src: 'dog1.jpg' }),
 				img({ alt: 'Black Labrador', src: 'dog2.jpg' } })
 			)
-		)
-	)
-document.body.appendChild(helloWorld);
+		);
+	
+let helloWorldNodes = createNodes(helloWorldTree);
+document.body.appendChild(helloWorldNodes);
 ```
 Will create: 
 ```html 
