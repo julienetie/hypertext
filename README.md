@@ -1,22 +1,17 @@
 # _hypertext_
 
-Create [virtual-dom](https://github.com/Matt-Esch/virtual-dom)'s [virtual-hyperscript](https://github.com/Raynos/virtual-hyperscript) **VTrees** or **DOM elements** using **_hypertext_**
-
-
-```php
-**Working ALPHA**
-```
+Create HTML in JavaScript via [virtual-dom](https://github.com/Matt-Esch/virtual-dom) VTrees or directly to the DOM: [virtual-hyperscript](https://github.com/Raynos/virtual-hyperscript) alternative.
 
 
 ## What you need to know:
-#### **1**) _hypertext_ is written in ES6, can be used in any workflow.
-See [Hypertext with ES6, ES5, CommonJS, AMD & globals](https://github.com/julienetie/hypertext/wiki/Hypertext-with-ES6,-ES5,-CommonJS,-AMD-&-globals)
+#### **1**) _Hypertext_ is written in ES6, but can be used in any workflow.
+See: [Hypertext with ES6, ES5, CommonJS, AMD & globals](https://github.com/julienetie/hypertext/wiki/Hypertext-with-ES6,-ES5,-CommonJS,-AMD-&-globals)
 
 &nbsp;&nbsp;&nbsp;&nbsp;Demo using **```npm run play```** tweak **```./playground.js```** then check port **`9966`**
 
-&nbsp;&nbsp;&nbsp;&nbsp;Quick demo src**```./dist/hypertext-not-for-production.min.js```** all tags will miserably be global.
+&nbsp;&nbsp;&nbsp;&nbsp;To demo directly use **```./dist/hypertext-not-for-production.min.js```** all tags will miserably be global.
 
-- &nbsp;&nbsp;&nbsp;&nbsp;```npm i --save hypertext``` : Install **Not yet on npm, git clone for now**
+- &nbsp;&nbsp;&nbsp;&nbsp;```npm i --save hypertext``` : Install
 - &nbsp;&nbsp;&nbsp;&nbsp;```npm run build``` : Builds all distributions
 - &nbsp;&nbsp;&nbsp;&nbsp;```npm run play``` : Host playground.js on port 9966
 
@@ -55,14 +50,12 @@ Will create:
             </figure>
         </div>
 ```
-#### **4**) Case: Use hypertext with a virtual dom
+#### **4**) Case: Use Hypertext with a virtual dom
 
-hypertext currently supports any virtual dom based on [virtual-dom](https://github.com/Matt-Esch/virtual-dom)'s VTrees.
+Hypertext currently supports any virtual dom based on [virtual-dom](https://github.com/Matt-Esch/virtual-dom)'s VTrees.
 Such as: 
 - [virtual-dom](https://github.com/Matt-Esch/virtual-dom)
 - [mercury](https://github.com/Raynos/mercury)
-
-&nbsp;&nbsp;&nbsp;&nbsp;<sup>Future updates will support additional virtual doms</sup>
 
 A modification of virtual-dom's example:
 ```
@@ -99,17 +92,17 @@ setInterval(function () {
 ```
 #### **5**) Ramblings
 
-**_hypertext_** is the only hyperscript that features identical tag notation to HTML without the use of a transformer as with JSX.
-There's a few good reasons to use _hypertext_
-- Those who know HTML but with little to no JavaScript knowledge already know **_hypertext_**.
+**_Hypertext_** features identical tag notation to HTML without the use of a transformer as with JSX.
+There's a few good reasons to use _Hypertext_
+- Those who know HTML but with little to no JavaScript knowledge already know **_Hypertext_**.
 - There is no set up or compiling for production use.
-- hypertext is valid JavaScript.
+- Hypertext is valid JavaScript.
 - Only supports valid HTML tags (Custom HTML pending).
 - Supports condtitions and easy to use iterations (loop() fn pending).
 - For some, the syntax may be more readable than markup: ```</closingTag>``` === ```)```.
 - Has no dependencies, but obviously requires a virtual DOM if you care about repaint/ reflow (You should).
-- **_hypertext_** hopes to one day be virtual-dom agnostic (_e.g. React, Vue 2.0, incremental dom support_) as "most" of 
-the differences between various virtual dom libraries do not warrant complete re-implementations of hypertext.
+- **_Hypertext_** hopes to one day be virtual-dom agnostic (_e.g. React, Vue 2.0, incremental dom support_) as "most" of 
+the differences between various virtual dom libraries do not warrant complete re-implementations of Hypertext.
 
 
 #### **6**) Contribute
@@ -122,7 +115,7 @@ the differences between various virtual dom libraries do not warrant complete re
 
 #### **7**) Thanks
 
-To Matt Esch and Jake Verbaten for creating a bunch of cool libraries and modules that made hypertext feasible.
+To Matt Esch and Jake Verbaten for creating a bunch of cool libraries and modules that made Hypertext feasible.
 
 [MIT](https://github.com/julienetie/hypertext/blob/master/LICENSE)
 Copyright (c) 2016 Julien Etienne
