@@ -1,7 +1,7 @@
 {
   "name": "hypertext",
-  "version": "0.1.2",
-  "description": "Create [virtual-dom](https://github.com/Matt-Esch/virtual-dom)'s [virtual-hyperscript](https://github.com/Raynos/virtual-hyperscript) **VTrees** or **DOM elements** using **_hypertext_**",
+  "version": "1.0.0",
+  "description": "Create HTML in JavaScript via virtual-dom VTrees or directly to the DOM: virtual-hyperscript alternative",
   "main": "dist/hypertext.js",
   "jsnext:main": "dist/hypertext.es.js",
   "scripts": {
@@ -16,9 +16,21 @@
     "type": "git",
     "url": "git+https://github.com/julienetie/hypertext.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "virtual-dom",
+    "virtual-hyperscript",
+    "VTrees",
+    "vdom",
+    "dom",
+    "createelement",
+    "create html",
+    "make html JavaScript",
+    "virtual tree",
+    "jsx",
+    "react"
+  ],
+  "author": "Julien Etienne",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/julienetie/hypertext/issues"
   },
@@ -42,11 +54,6 @@
     "wzrd": "^1.4.0"
   },
   "dependencies": {
-    "browser-split": "0.0.1",
-    "ev-store": "^7.0.0",
-    "lodash-es": "^4.16.4",
-    "parse-tag": "^1.0.0",
-    "virtual-hyperscript": "^4.6.0",
-    "x-is-array": "^0.1.0"
+    "lodash-es": "^4.16.4"
   }
 }
