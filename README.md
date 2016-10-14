@@ -31,7 +31,7 @@ const helloWorldTree =
 			figure({ class: 'img-section' },
 				figcaption('Three different breeds of dogs.'),
 				img({ alt: 'Maltese Terrier', src: 'dog1.jpg' }),
-				img({ alt: 'Black Labrador', src: 'dog2.jpg' } })
+				img({ alt: 'Black Labrador', src: 'dog2.jpg' })
 			)
 		);
 	
