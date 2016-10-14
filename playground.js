@@ -13,10 +13,15 @@
  * 
  * or require the exported object.
  */
-var fn = require('./dist/hypertext.cjs.js');
+var fn = require('./dist/hypertext.js');
 Object.assign(window,fn) // This is bad
 
-
+var div = assembly('div');
+var h1 = assembly('h1');
+var p = assembly('p');
+var img = assembly('img');
+var figure = assembly('figure');
+var figcaption = assembly('figcaption');
 
 /** 
  * ***************************************

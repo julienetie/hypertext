@@ -37,6 +37,7 @@ const applyProperties = (node, props, previous) => {
     }
 }
 
+
 export default function create(virtualNode, opts) {
     const doc = opts ? opts.document || document : document;
     const warn = opts ? opts.warn : null;
@@ -103,17 +104,6 @@ const patchObject = (node, props, previous, propName, propValue) => {
 
         return;
     }
-
-
-    // TODO, check how style is being handled.
-
-    // console.log(node, propName, propValue)
-    //  if (previousValue && isPlainObject(previousValue) &&
-    //      getPrototype(previousValue) !== getPrototype(propValue)) {
-    //      console.log(node, popName, propValue)
-    //      node[propName] = propValue;
-    //      return;
-    //  }
 
     if (!isPlainObject(node[propName])) {
         node[propName] = {};

@@ -994,18 +994,6 @@ VirtualNode.prototype.type = "VirtualNode";
 VirtualText.prototype.version = version;
 VirtualText.prototype.type = "VirtualText";
 
-function UnexpectedVirtualElement(data) {
-    var err = new Error();
-
-    err.type = 'virtual-hyperscript.unexpected.virtual-element';
-    err.message = 'Unexpected virtual child passed to h().\n' + 'Expected a VNode / Vthunk / VWidget / string but:\n' + 'got:\n' + errorString(data.foreignObject) + '.\n' + 'The parent vnode is:\n' + errorString(data.parentVnode);
-    '\n' + 'Suggested fix: change your `h(..., [ ... ])` callsite.';
-    err.foreignObject = data.foreignObject;
-    err.parentVnode = data.parentVnode;
-
-    return err;
-}
-
 function UnsupportedValueType(data) {
     var err = new Error();
 
@@ -1103,32 +1091,39 @@ const assembly = tagName => {
             transformProperties(props);
         }
 
-        addChild(children, childNodes, tagName, props);
-        return new VirtualNode(tagName, props, childNodes, key, namespace);
+        let allChildNodes = addChild(children, childNodes);
+
+        return new VirtualNode(tagName, props, allChildNodes, key, namespace);
     };
 };
 
-const addChild = (child, childNodes, tag, props) => {
+const addChild = (child, childNodes) => {
+    let tempChildNodes = Array.from(childNodes);
 
     if (typeof child === 'string' || typeof child === 'number') {
-        childNodes.push(new VirtualText(child));
+        tempChildNodes.push(new VirtualText(child));
     } else if (isChild(child)) {
-        childNodes.push(child);
+        tempChildNodes.push(child);
     } else if (isArray(child)) {
-        for (var i = 0; i < child.length; i++) {
-            addChild(child[i], childNodes, tag, props);
+        let childLength = child.length;
+        let someTemp;
+        for (let i = 0; i < childLength; i++) {
+            console.log(addChild(child[i], tempChildNodes));
         }
+        console.log(someTemp);
+        tempChildNodes.push(someTemp);
     } else if (child === null || child === undefined) {
-        return;
+        // return;
     } else {
-        throw UnexpectedVirtualElement({
-            foreignObject: child,
-            parentVnode: {
-                tagName: tag,
-                properties: props
-            }
-        });
-    }
+            // throw UnexpectedVirtualElement({
+            //     foreignObject: child,
+            //     parentVnode: {
+            //         tagName: tag,
+            //         properties: props
+            //     }
+            // });
+        }
+    return tempChildNodes;
 };
 
 const handleThunk = (a, b) => {
@@ -1227,16 +1222,6 @@ const patchObject = (node, props, previous, propName, propValue) => {
 
         return;
     }
-
-    // TODO, check how style is being handled.
-
-    // console.log(node, propName, propValue)
-    //  if (previousValue && isPlainObject(previousValue) &&
-    //      getPrototype(previousValue) !== getPrototype(propValue)) {
-    //      console.log(node, popName, propValue)
-    //      node[propName] = propValue;
-    //      return;
-    //  }
 
     if (!isPlainObject(node[propName])) {
         node[propName] = {};
