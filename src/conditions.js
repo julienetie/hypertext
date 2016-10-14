@@ -2,13 +2,13 @@ import version from './version';
 import isArray from '../node_modules/lodash-es/isArray';
 
 
-const isVirtualText = (x) => {
-	return x && x.type === "VirtualText" && x.version === version;
+const isVirtualText = (virtualText) => {
+	return virtualText && virtualText.type === "VirtualText" && virtualText.version === version;
 };
 
 
-const isThunk = (t) => {
-	return t && t.type === "Thunk";
+const isThunk = (thunk) => {
+	return thunk && thunk.type === "Thunk";
 }
 
 
@@ -19,13 +19,13 @@ const isHook = (hook) => {
 };
 
 
-const isVirtualNode = (x) => {
-	return x && x.type === "VirtualNode" && x.version === version;
+const isVirtualNode = (VirtualNode) => {
+	return VirtualNode && VirtualNode.type === "VirtualNode" && VirtualNode.version === version;
 };
 
 
-const isWidget = (w) => {
-	return w && w.type === "Widget";
+const isWidget = (widget) => {
+	return widget && widget.type === "Widget";
 };
 
 
@@ -40,13 +40,13 @@ const hasPatches = (patch) => {
 };
 
 
-const isChild = (x) => {
-	return isVirtualNode(x) || isVirtualText(x) || isWidget(x) || isThunk(x);
+const isChild = (child) => {
+	return isVirtualNode(child) || isVirtualText(child) || isWidget(child) || isThunk(child);
 };
 
 
-const isChildren = (x) => {
-	return typeof x === 'string' || isArray(x) || isChild(x);
+const isChildren = (children) => {
+	return typeof children === 'string' || isArray(children) || isChild(children);
 };
 
 export { 
