@@ -186,31 +186,6 @@ function isPlainObject(value) {
     Ctor instanceof Ctor && funcToString.call(Ctor) == objectCtorString);
 }
 
-/**
- * Checks if `value` is classified as an `Array` object.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an array, else `false`.
- * @example
- *
- * _.isArray([1, 2, 3]);
- * // => true
- *
- * _.isArray(document.body.children);
- * // => false
- *
- * _.isArray('abc');
- * // => false
- *
- * _.isArray(_.noop);
- * // => false
- */
-var isArray = Array.isArray;
-
 /** Used for built-in method references. */
 var objectProto$3 = Object.prototype;
 
@@ -599,6 +574,31 @@ var isArguments = baseIsArguments(function() { return arguments; }()) ? baseIsAr
     !propertyIsEnumerable.call(value, 'callee');
 };
 
+/**
+ * Checks if `value` is classified as an `Array` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an array, else `false`.
+ * @example
+ *
+ * _.isArray([1, 2, 3]);
+ * // => true
+ *
+ * _.isArray(document.body.children);
+ * // => false
+ *
+ * _.isArray('abc');
+ * // => false
+ *
+ * _.isArray(_.noop);
+ * // => false
+ */
+var isArray = Array.isArray;
+
 /** Used as references for various `Number` constants. */
 var MAX_SAFE_INTEGER = 9007199254740991;
 
@@ -898,28 +898,28 @@ function isEmpty(value) {
 
 const version = '2';
 
-const isVirtualText = x => {
-	return x && x.type === "VirtualText" && x.version === version;
+const isVirtualText = virtualText => {
+	return virtualText && virtualText.type === "VirtualText" && virtualText.version === version;
 };
 
-const isThunk = t => {
-	return t && t.type === "Thunk";
+const isThunk = thunk => {
+	return thunk && thunk.type === "Thunk";
 };
 
 const isHook = hook => {
 	return hook && (typeof hook.hook === "function" && !hook.hasOwnProperty("hook") || typeof hook.unhook === "function" && !hook.hasOwnProperty("unhook"));
 };
 
-const isVirtualNode = x => {
-	return x && x.type === "VirtualNode" && x.version === version;
+const isVirtualNode = VirtualNode => {
+	return VirtualNode && VirtualNode.type === "VirtualNode" && VirtualNode.version === version;
 };
 
-const isWidget = w => {
-	return w && w.type === "Widget";
+const isWidget = widget => {
+	return widget && widget.type === "Widget";
 };
 
-const isChild = x => {
-	return isVirtualNode(x) || isVirtualText(x) || isWidget(x) || isThunk(x);
+const isChild = child => {
+	return isVirtualNode(child) || isVirtualText(child) || isWidget(child) || isThunk(child);
 };
 
 function VirtualNode(tagName, properties, children, key, namespace) {
@@ -1013,11 +1013,11 @@ function errorString(obj) {
     }
 }
 
-const transformProperties = props => {
+var transformProperties = (props => {
 
-    for (var propName in props) {
+    for (let propName in props) {
         if (props.hasOwnProperty(propName)) {
-            var value = props[propName];
+            let value = props[propName];
             if (isHook(value)) {
                 continue;
             }
@@ -1026,9 +1026,33 @@ const transformProperties = props => {
             }
         }
     }
+});
+
+const getChildNodes = (child, childNodes) => {
+    let tempChildNodes = Array.from(childNodes);
+
+    if (typeof child === 'string' || typeof child === 'number') {
+        tempChildNodes.push(new VirtualText(child));
+    } else if (isChild(child)) {
+        tempChildNodes.push(child);
+    } else if (isArray(child)) {
+        let childLength = child.length;
+        for (let i = 0; i < childLength; i++) {
+            tempChildNodes.push(getChildNodes(child[i], childNodes)[0]);
+        }
+    } else {
+        // throw UnexpectedVirtualElement({
+        //     foreignObject: child,
+        //     parentVnode: {
+        //         tagName: tag,
+        //         properties: props
+        //     }
+        // });
+    }
+    return tempChildNodes;
 };
 
-const assembly = tagName => {
+var assembly = (tagName => {
 
     return function (...args) {
         let childNodes = [];
@@ -1096,31 +1120,25 @@ const assembly = tagName => {
 
         return new VirtualNode(tagName, props, allChildNodes, key, namespace);
     };
-};
+});
 
-const getChildNodes = (child, childNodes) => {
-    let tempChildNodes = Array.from(childNodes);
+function internal(data, callback, supportData) {
+	let childContainer = callback.apply(this, [data, supportData]);
+	if (isArray(childContainer)) {
+		return childContainer;
+	} else {
+		throw new Error('A loop must return an array');
+	}
+}
 
-    if (typeof child === 'string' || typeof child === 'number') {
-        tempChildNodes.push(new VirtualText(child));
-    } else if (isChild(child)) {
-        tempChildNodes.push(child);
-    } else if (isArray(child)) {
-        let childLength = child.length;
-        for (let i = 0; i < childLength; i++) {
-            tempChildNodes.push(getChildNodes(child[i], childNodes)[0]);
-        }
-    } else {
-        // throw UnexpectedVirtualElement({
-        //     foreignObject: child,
-        //     parentVnode: {
-        //         tagName: tag,
-        //         properties: props
-        //     }
-        // });
-    }
-    return tempChildNodes;
-};
+function internal$1(data, callback, supportData) {
+	let childContainer = callback.apply(this, [data, supportData]);
+	if (isArray(childContainer) || isChild(childContainer || typeof childContainer === 'string')) {
+		return childContainer;
+	} else {
+		throw new Error('or() must return a virtualChildNode, Array or String');
+	}
+}
 
 const handleThunk = (a, b) => {
     return {

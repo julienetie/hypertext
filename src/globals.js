@@ -1,4 +1,4 @@
-import assembly from './assembly';
+import { assembly, loop, or } from './assembly';
 import create from './create';
 
 

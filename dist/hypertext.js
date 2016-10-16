@@ -97,6 +97,7 @@ function overArg(func, transform) {
   };
 }
 
+/** Built-in value references. */
 var getPrototype = overArg(Object.getPrototypeOf, Object);
 
 /**
@@ -127,6 +128,7 @@ function isObjectLike(value) {
   return value != null && typeof value == 'object';
 }
 
+/** `Object#toString` result references. */
 var objectTag = '[object Object]';
 
 /** Used for built-in method references. */
@@ -207,8 +209,10 @@ function isPrototype(value) {
   return value === proto;
 }
 
+/* Built-in method references for those with the same name as other `lodash` methods. */
 var nativeKeys = overArg(Object.keys, Object);
 
+/** Used for built-in method references. */
 var objectProto$2 = Object.prototype;
 
 /** Used to check objects for own properties. */
@@ -264,6 +268,7 @@ function isObject(value) {
   return value != null && (type == 'object' || type == 'function');
 }
 
+/** `Object#toString` result references. */
 var funcTag = '[object Function]';
 var genTag = '[object GeneratorFunction]';
 var proxyTag = '[object Proxy]';
@@ -305,13 +310,16 @@ function isFunction(value) {
 /** Detect free variable `global` from Node.js. */
 var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
 
+/** Detect free variable `self`. */
 var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
 
 /** Used as a reference to the global object. */
 var root$1 = freeGlobal || freeSelf || Function('return this')();
 
+/** Used to detect overreaching core-js shims. */
 var coreJsData = root$1['__core-js_shared__'];
 
+/** Used to detect methods masquerading as native. */
 var maskSrcKey = (function() {
   var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || '');
   return uid ? ('Symbol(src)_1.' + uid) : '';
@@ -353,6 +361,10 @@ function toSource(func) {
   return '';
 }
 
+/**
+ * Used to match `RegExp`
+ * [syntax characters](http://ecma-international.org/ecma-262/7.0/#sec-patterns).
+ */
 var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
 
 /** Used to detect host constructors (Safari). */
@@ -402,19 +414,32 @@ function getValue(object, key) {
   return object == null ? undefined : object[key];
 }
 
+/**
+ * Gets the native function at `key` of `object`.
+ *
+ * @private
+ * @param {Object} object The object to query.
+ * @param {string} key The key of the method to get.
+ * @returns {*} Returns the function if it's native, else `undefined`.
+ */
 function getNative(object, key) {
   var value = getValue(object, key);
   return baseIsNative(value) ? value : undefined;
 }
 
+/* Built-in method references that are verified to be native. */
 var DataView = getNative(root$1, 'DataView');
 
+/* Built-in method references that are verified to be native. */
 var Map = getNative(root$1, 'Map');
 
+/* Built-in method references that are verified to be native. */
 var Promise$1 = getNative(root$1, 'Promise');
 
+/* Built-in method references that are verified to be native. */
 var Set = getNative(root$1, 'Set');
 
+/* Built-in method references that are verified to be native. */
 var WeakMap = getNative(root$1, 'WeakMap');
 
 /** Used for built-in method references. */
@@ -438,6 +463,7 @@ function baseGetTag(value) {
   return objectToString$3.call(value);
 }
 
+/** `Object#toString` result references. */
 var mapTag$1 = '[object Map]';
 var objectTag$1 = '[object Object]';
 var promiseTag = '[object Promise]';
@@ -498,6 +524,7 @@ if ((DataView && getTag(new DataView(new ArrayBuffer(1))) != dataViewTag) ||
 
 var getTag$1 = getTag;
 
+/** `Object#toString` result references. */
 var argsTag = '[object Arguments]';
 
 /** Used for built-in method references. */
@@ -521,6 +548,7 @@ function baseIsArguments(value) {
   return isObjectLike(value) && objectToString$4.call(value) == argsTag;
 }
 
+/** Used for built-in method references. */
 var objectProto$8 = Object.prototype;
 
 /** Used to check objects for own properties. */
@@ -611,6 +639,31 @@ function isLength(value) {
     value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
 }
 
+/**
+ * Checks if `value` is array-like. A value is considered array-like if it's
+ * not a function and has a `value.length` that's an integer greater than or
+ * equal to `0` and less than or equal to `Number.MAX_SAFE_INTEGER`.
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
+ * @example
+ *
+ * _.isArrayLike([1, 2, 3]);
+ * // => true
+ *
+ * _.isArrayLike(document.body.children);
+ * // => true
+ *
+ * _.isArrayLike('abc');
+ * // => true
+ *
+ * _.isArrayLike(_.noop);
+ * // => false
+ */
 function isArrayLike(value) {
   return value != null && isLength(value.length) && !isFunction(value);
 }
@@ -632,6 +685,7 @@ function stubFalse() {
   return false;
 }
 
+/** Detect free variable `exports`. */
 var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
@@ -665,6 +719,7 @@ var nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined;
  */
 var isBuffer = nativeIsBuffer || stubFalse;
 
+/** `Object#toString` result references. */
 var argsTag$1 = '[object Arguments]';
 var arrayTag = '[object Array]';
 var boolTag = '[object Boolean]';
@@ -742,6 +797,7 @@ function baseUnary(func) {
   };
 }
 
+/** Detect free variable `exports`. */
 var freeExports$1 = typeof exports == 'object' && exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
@@ -760,6 +816,7 @@ var nodeUtil = (function() {
   } catch (e) {}
 }());
 
+/* Node.js helper references. */
 var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
 
 /**
@@ -781,6 +838,7 @@ var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
  */
 var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedArray;
 
+/** `Object#toString` result references. */
 var mapTag = '[object Map]';
 var setTag = '[object Set]';
 
