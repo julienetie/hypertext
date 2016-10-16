@@ -192,31 +192,6 @@ function isPlainObject(value) {
     Ctor instanceof Ctor && funcToString.call(Ctor) == objectCtorString);
 }
 
-/**
- * Checks if `value` is classified as an `Array` object.
- *
- * @static
- * @memberOf _
- * @since 0.1.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is an array, else `false`.
- * @example
- *
- * _.isArray([1, 2, 3]);
- * // => true
- *
- * _.isArray(document.body.children);
- * // => false
- *
- * _.isArray('abc');
- * // => false
- *
- * _.isArray(_.noop);
- * // => false
- */
-var isArray = Array.isArray;
-
 /** Used for built-in method references. */
 var objectProto$3 = Object.prototype;
 
@@ -605,6 +580,31 @@ var isArguments = baseIsArguments(function() { return arguments; }()) ? baseIsAr
     !propertyIsEnumerable.call(value, 'callee');
 };
 
+/**
+ * Checks if `value` is classified as an `Array` object.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.1.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is an array, else `false`.
+ * @example
+ *
+ * _.isArray([1, 2, 3]);
+ * // => true
+ *
+ * _.isArray(document.body.children);
+ * // => false
+ *
+ * _.isArray('abc');
+ * // => false
+ *
+ * _.isArray(_.noop);
+ * // => false
+ */
+var isArray = Array.isArray;
+
 /** Used as references for various `Number` constants. */
 var MAX_SAFE_INTEGER = 9007199254740991;
 
@@ -904,28 +904,28 @@ function isEmpty(value) {
 
 var version = '2';
 
-var isVirtualText = function isVirtualText(x) {
-	return x && x.type === "VirtualText" && x.version === version;
+var isVirtualText = function isVirtualText(virtualText) {
+	return virtualText && virtualText.type === "VirtualText" && virtualText.version === version;
 };
 
-var isThunk = function isThunk(t) {
-	return t && t.type === "Thunk";
+var isThunk = function isThunk(thunk) {
+	return thunk && thunk.type === "Thunk";
 };
 
 var isHook = function isHook(hook) {
 	return hook && (typeof hook.hook === "function" && !hook.hasOwnProperty("hook") || typeof hook.unhook === "function" && !hook.hasOwnProperty("unhook"));
 };
 
-var isVirtualNode = function isVirtualNode(x) {
-	return x && x.type === "VirtualNode" && x.version === version;
+var isVirtualNode = function isVirtualNode(VirtualNode) {
+	return VirtualNode && VirtualNode.type === "VirtualNode" && VirtualNode.version === version;
 };
 
-var isWidget = function isWidget(w) {
-	return w && w.type === "Widget";
+var isWidget = function isWidget(widget) {
+	return widget && widget.type === "Widget";
 };
 
-var isChild = function isChild(x) {
-	return isVirtualNode(x) || isVirtualText(x) || isWidget(x) || isThunk(x);
+var isChild = function isChild(child) {
+	return isVirtualNode(child) || isVirtualText(child) || isWidget(child) || isThunk(child);
 };
 
 function VirtualNode(tagName, properties, children, key, namespace) {
@@ -1018,6 +1018,45 @@ function errorString(obj) {
         return String(obj);
     }
 }
+
+var transformProperties = (function (props) {
+
+    for (var propName in props) {
+        if (props.hasOwnProperty(propName)) {
+            var value = props[propName];
+            if (isHook(value)) {
+                continue;
+            }
+            if (propName.substr(0, 3) === 'ev-') {
+                props[propName] = eventHook(value);
+            }
+        }
+    }
+});
+
+var getChildNodes = function getChildNodes(child, childNodes) {
+    var tempChildNodes = Array.from(childNodes);
+
+    if (typeof child === 'string' || typeof child === 'number') {
+        tempChildNodes.push(new VirtualText(child));
+    } else if (isChild(child)) {
+        tempChildNodes.push(child);
+    } else if (isArray(child)) {
+        var childLength = child.length;
+        for (var i = 0; i < childLength; i++) {
+            tempChildNodes.push(getChildNodes(child[i], childNodes)[0]);
+        }
+    } else {
+        // throw UnexpectedVirtualElement({
+        //     foreignObject: child,
+        //     parentVnode: {
+        //         tagName: tag,
+        //         properties: props
+        //     }
+        // });
+    }
+    return tempChildNodes;
+};
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
@@ -1219,22 +1258,7 @@ var set = function set(object, property, value, receiver) {
   return value;
 };
 
-var transformProperties = function transformProperties(props) {
-
-    for (var propName in props) {
-        if (props.hasOwnProperty(propName)) {
-            var value = props[propName];
-            if (isHook(value)) {
-                continue;
-            }
-            if (propName.substr(0, 3) === 'ev-') {
-                props[propName] = eventHook(value);
-            }
-        }
-    }
-};
-
-var assembly$1 = function assembly$1(tagName) {
+var assembly$1 = (function (tagName) {
 
     return function () {
         var childNodes = [];
@@ -1306,31 +1330,7 @@ var assembly$1 = function assembly$1(tagName) {
 
         return new VirtualNode(tagName, props, allChildNodes, key, namespace);
     };
-};
-
-var getChildNodes = function getChildNodes(child, childNodes) {
-    var tempChildNodes = Array.from(childNodes);
-
-    if (typeof child === 'string' || typeof child === 'number') {
-        tempChildNodes.push(new VirtualText(child));
-    } else if (isChild(child)) {
-        tempChildNodes.push(child);
-    } else if (isArray(child)) {
-        var childLength = child.length;
-        for (var i = 0; i < childLength; i++) {
-            tempChildNodes.push(getChildNodes(child[i], childNodes)[0]);
-        }
-    } else {
-        // throw UnexpectedVirtualElement({
-        //     foreignObject: child,
-        //     parentVnode: {
-        //         tagName: tag,
-        //         properties: props
-        //     }
-        // });
-    }
-    return tempChildNodes;
-};
+});
 
 var handleThunk = function handleThunk(a, b) {
     return {

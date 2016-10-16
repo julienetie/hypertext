@@ -1,36 +1,14 @@
-import { SoftSetHook, eventHook } from './ev-store';
+import { SoftSetHook } from '../ev-store';
 import isPlainObject from 'lodash-es/isPlainObject';
-import isArray from 'lodash-es/isArray';
 import isEmpty  from 'lodash-es/isEmpty';
-import { VirtualNode, VirtualText } from './virtual-node';
-import version from './version';
-import { UnexpectedVirtualElement, UnsupportedValueType, errorString } from './validation';
-import {
-    isThunk,
-    isVirtualText,
-    isChild,
-    isHook,
-    isVirtualNode,
-    isWidget
-} from './conditions';
+import { VirtualNode } from '../virtual-node';
+import version from '../version';
+import { UnsupportedValueType } from '../validation';
+import { isHook } from '../conditions';
+import transformProperties from './transform-properties';
+import getChildNodes from './get-child-nodes';
 
-
-const transformProperties = (props) => {
-
-    for (var propName in props) {
-        if (props.hasOwnProperty(propName)) {
-            var value = props[propName];
-            if (isHook(value)) {
-                continue;
-            }
-            if (propName.substr(0, 3) === 'ev-') {
-                props[propName] = eventHook(value);
-            }
-        }
-    }
-}
-
-const assembly = (tagName) => {
+export default (tagName) => {
 
     return function(...args) {
         let childNodes = [];
@@ -105,31 +83,3 @@ const assembly = (tagName) => {
         return new VirtualNode(tagName, props, allChildNodes, key, namespace);
     };
 }
-
-
-
-const getChildNodes = (child, childNodes) => {
-    let tempChildNodes = Array.from(childNodes);
-
-    if (typeof child === 'string' || typeof child === 'number') {
-        tempChildNodes.push(new VirtualText(child));
-    } else if (isChild(child)) {
-        tempChildNodes.push(child);
-    } else if (isArray(child)) {
-        let childLength = child.length;
-        for (let i = 0; i < childLength; i++) {
-           tempChildNodes.push(getChildNodes(child[i], childNodes)[0]); 
-        }
-    } else {
-        // throw UnexpectedVirtualElement({
-        //     foreignObject: child,
-        //     parentVnode: {
-        //         tagName: tag,
-        //         properties: props
-        //     }
-        // });
-    }
-    return tempChildNodes;
-}
-
-export default assembly;
