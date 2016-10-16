@@ -26,18 +26,7 @@ var ul = assembly('ul');
 var li = assembly('li');
 var a = assembly('a');
 
-var someData = {fruit: 'apple', meat: 'beef', veg: 'cucumber'};
 
-const myLoopFunc = (one) =>{
-	var fruit = one.fruit;
-	return [fruit];
-	}
-
-
-var d = loop(someData, myLoopFunc);
-
-
-console.log(d)
 
 /** 
  * ***************************************
@@ -108,38 +97,78 @@ console.log(d)
  * Example 3:    Hypertext loop
  * ***************************************
  */
- 	// We have some data, can be any data type.
- 	var myData = { name: 'Bob', type: 'Human', gender: 'Male', where: 'Earth', why: 'Not sure' }
- 	
- 	// Modify the data any way possible providing an array is returned.
- 	function myCallback(data){
- 		let results = [];
- 		for(var info in data){
- 			if(info === 'name'){
- 				continue;
- 			}
- 			results.push(li(a({href:'#'}, data[info])))
- 		}
- 		return results;
- 	}
 
- 	// The purpose of the loop fn is for it to keep the view clean of logic.
-		var helloWorld =
-		    createNodes(
-		        div({ class: 'hello', id: 'world' },
-		            h1('Hello World!'),
-		            p('This is Hypertext'),
-		            figure({ class: 'img-section' },
-		                figcaption('This is random Art'),
-		                img({ alt: 'Banksy', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Banksy-art.jpg/220px-Banksy-art.jpg' }),
-		                img({ alt: 'The Scream', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/The_Scream.jpg/220px-The_Scream.jpg' }),
-		            	ul(
-		            		loop(myData, myCallback)
-		            	)
-		            )
-		        )
-		    )
-		document.body.appendChild(helloWorld);
+
+ 	// // We have some data, can be any data type.
+ 	// var myData = { name: 'Bob', type: 'Human', gender: 'Male', where: 'Earth', why: 'Not sure' }
+ 	
+ 	// // Modify the data any way possible providing an array is returned.
+ 	// function myCallback(data){
+ 	// 	let results = [];
+ 	// 	for(var info in data){
+ 	// 		if(info === 'name'){
+ 	// 			continue;
+ 	// 		}
+ 	// 		results.push(li(a({href:'#'}, data[info])))
+ 	// 	}
+ 	// 	return results;
+ 	// }
+
+ 	// // The purpose of the loop fn is for it to keep the view clean of logic.
+		// var helloWorld =
+		//     createNodes(
+		//         div({ class: 'hello', id: 'world' },
+		//             h1('Hello World!'),
+		//             p('This is Hypertext'),
+		//             figure({ class: 'img-section' },
+		//                 figcaption('This is random Art'),
+		//                 img({ alt: 'Banksy', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Banksy-art.jpg/220px-Banksy-art.jpg' }),
+		//                 img({ alt: 'The Scream', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/The_Scream.jpg/220px-The_Scream.jpg' }),
+		//             	ul(
+		//             		loop(myData, myCallback)
+		//             	)
+		//             )
+		//         )
+		//     )
+		// document.body.appendChild(helloWorld);
+
+
+/** 
+ * ***************************************
+ * Example 4:    Hypertext or
+ * ***************************************
+ */
+
+ 	// // Change this support data.
+ 	// let whatToDo = 'Don\'t be confusing';
+
+ 	// // Modify the data any way possible providing an array is returned.
+ 	// function myCallback(data, supportData){
+ 	// 	if(supportData !== 'Don\'t be confusing'){
+ 	// 		console.log('yesss')
+ 	// 		return [data.hello, data.goodbye];
+ 	// 	}	
+ 	// 	return [data.hello];
+ 	// }
+
+ 	// // The purpose of the loop fn is for it to keep the view clean of logic.
+		// var helloWorld =
+		//     createNodes(
+		//         div({ class: 'hello', id: 'world' },
+		//             h1('Hello World!'),
+		//             p('This is Hypertext'),
+	 //            	div(
+	 //            		or({
+	 //            			hello: div('hello World!'), 
+	 //            			goodbye: p('Goodbye mr Bond!')
+	 //            			},
+	 //            			myCallback,
+	 //            			whatToDo
+	 //            		)
+	 //            	)
+		//         )
+		//     )
+		// document.body.appendChild(helloWorld);
 
 // - Hypertext   		https://github.com/julienetie/hypertext
 // - Virtual-dom 		https://github.com/Matt-Esch/virtual-dom

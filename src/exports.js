@@ -1,5 +1,5 @@
-import { assembly, loop } from './assembly';
+import { assembly, loop, or } from './assembly';
 import create from './create';
 
 const createNodes = create;
-export { assembly, loop, createNodes }
+export { assembly, loop, or, createNodes }

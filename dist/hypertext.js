@@ -1274,8 +1274,8 @@ var createVirtualNode = (function (tagName) {
     };
 });
 
-function d(data, callback) {
-	var childContainer = callback.apply(this, [data]);
+function internal(data, callback, supportData) {
+	var childContainer = callback.apply(this, [data, supportData]);
 	if (isArray(childContainer)) {
 		return childContainer;
 	} else {
@@ -1283,8 +1283,21 @@ function d(data, callback) {
 	}
 }
 
-function loop(data, inner) {
-	return d.apply(this, [data, inner]);
+function loop(data, inner, supportData) {
+	return internal.apply(this, [data, inner, supportData]);
+}
+
+function internal$1(data, callback, supportData) {
+	var childContainer = callback.apply(this, [data, supportData]);
+	if (isArray(childContainer) || isChild(childContainer || typeof childContainer === 'string')) {
+		return childContainer;
+	} else {
+		throw new Error('or() must return a virtualChildNode, Array or String');
+	}
+}
+
+function or(data, inner, supportData) {
+	return internal$1.apply(this, [data, inner, supportData]);
 }
 
 var handleThunk = function handleThunk(a, b) {
@@ -1424,6 +1437,7 @@ var createNodes = create;
 
 exports.assembly = createVirtualNode;
 exports.loop = loop;
+exports.or = or;
 exports.createNodes = createNodes;
 
 Object.defineProperty(exports, '__esModule', { value: true });
