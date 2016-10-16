@@ -1,5 +1,5 @@
-import assemblyMain from './assembly';
+import { assembly, loop } from './assembly';
 import create from './create';
 
-export const assembly = assemblyMain;
-export const createNodes = create;
+const createNodes = create;
+export { assembly, loop, createNodes }

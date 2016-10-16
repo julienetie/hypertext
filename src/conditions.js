@@ -49,6 +49,15 @@ const isChildren = (children) => {
 	return typeof children === 'string' || isArray(children) || isChild(children);
 };
 
+const isJSON = (str) => {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
 export { 
 	isVirtualText, 
 	isThunk, 
@@ -57,5 +66,6 @@ export {
 	isWidget, 
 	hasPatches, 
 	isChild, 
-	isChildren 
+	isChildren,
+	isJSON
 };

@@ -1,2 +1,4 @@
 import assembly from './create-virtual-node';
-export default assembly;
+import loop from './loop';
+
+export { assembly, loop };

@@ -9,7 +9,7 @@
     "umd": "rollup -c rollup.config.umd.js",
     "globals": "rollup -c rollup.config.globals.js",
     "all": "concurrently \"rollup -c rollup.config.es.js\" \"rollup -c rollup.config.umd.js\" \"rollup -c rollup.config.globals.js\"",
-    "watch": "rollup -c rollup.config.es.js --watch",
+    "watch": "rollup -c rollup.config.umd.js --watch",
     "umd-watch": "rollup -c rollup.config.umd.js --watch",
     "play": "./node_modules/.bin/wzrd  playground.js | ./node_modules/.bin/wtch | ./node_modules/.bin/garnish"
   },
