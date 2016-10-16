@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log
+yarn.lock
+playground.js
+rollup.config.es.js
+rollup.config.umd.js
+rollup.config.globals.js
+src
+node_modules
+libs
