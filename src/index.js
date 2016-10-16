@@ -104,4 +104,5 @@ export const video = assembly('video');
 
 
 // Create API
-export const createNodes = create;
+const createNodes = create;
+export { assembly, loop, or, createNodes }

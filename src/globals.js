@@ -105,5 +105,7 @@ window.video = assembly('video');
 
 // Create API
 window.createNodes = create;
+window.loop = loop;
+window.or = or;
 
  

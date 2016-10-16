@@ -35,19 +35,19 @@ var a = assembly('a');
  */
 
 
-		// var helloWorld =
-		//     createNodes(
-		//         div({ class: 'hello', id: 'world' },
-		//             h1('Hello World!'),
-		//             p('This is Hypertext'),
-		//             figure({ class: 'img-section' },
-		//                 figcaption('This is random Art'),
-		//                 img({ alt: 'Banksy', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Banksy-art.jpg/220px-Banksy-art.jpg' }),
-		//                 img({ alt: 'The Scream', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/The_Scream.jpg/220px-The_Scream.jpg' })
-		//             )
-		//         )
-		//     )
-		// document.body.appendChild(helloWorld);
+		var helloWorld =
+		    createNodes(
+		        div({ class: 'hello', id: 'world' },
+		            h1('Hello World!'),
+		            p('This is Hypertext'),
+		            figure({ class: 'img-section' },
+		                figcaption('This is random Art'),
+		                img({ alt: 'Banksy', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Banksy-art.jpg/220px-Banksy-art.jpg' }),
+		                img({ alt: 'The Scream', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f4/The_Scream.jpg/220px-The_Scream.jpg' })
+		            )
+		        )
+		    )
+		document.body.appendChild(helloWorld);
 
 
 
