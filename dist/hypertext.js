@@ -4,85 +4,6 @@
 	(factory((global.hypertext = global.hypertext || {})));
 }(this, (function (exports) { 'use strict';
 
-var root = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : {};
-
-function Individual(key, value) {
-    if (key in root) {
-        // console.log('key in root', root[key])
-        return root[key];
-    }
-
-    root[key] = value;
-    // console.log('root', root[key])
-    return value;
-}
-
-function OneVersion(moduleName, version, defaultValue) {
-    var key = '__INDIVIDUAL_ONE_VERSION_' + moduleName;
-    var enforceKey = key + '_ENFORCE_SINGLETON';
-
-    var versionValue = Individual(enforceKey, version);
-
-    if (versionValue !== version) {
-        throw new Error('Can only have one copy of ' + moduleName + '.\n' + 'You already have version ' + versionValue + ' installed.\n' + 'This means you cannot install version ' + version);
-    }
-
-    return Individual(key, defaultValue);
-}
-
-var MY_VERSION = '7';
-OneVersion('ev-store', MY_VERSION);
-
-var hashKey = '__EV_STORE_KEY@' + MY_VERSION;
-
-function EvStore(elem) {
-    var hash = elem[hashKey];
-
-    if (!hash) {
-        hash = elem[hashKey] = {};
-    }
-    // console.log(hash)
-    return hash;
-}
-
-function eventHook(value) {
-    if (!(this instanceof eventHook)) {
-        return new eventHook(value);
-    }
-    this.value = value;
-}
-
-eventHook.prototype.hook = function (node, propertyName) {
-    // console.log('node',node)
-    var es = EvStore(node);
-    // console.log('es',es)
-    var propName = propertyName.substr(3);
-
-    es[propName] = this.value;
-    // console.log(propName, es[propName])
-};
-
-eventHook.prototype.unhook = function (node, propertyName) {
-    var es = EvStore(node);
-    var propName = propertyName.substr(3);
-
-    es[propName] = undefined;
-};
-
-function SoftSetHook(value) {
-    if (!(this instanceof SoftSetHook)) {
-        return new SoftSetHook(value);
-    }
-
-    this.value = value;
-}
-
-SoftSetHook.prototype.hook = function (node, propertyName) {
-    if (node[propertyName] !== this.value) {
-        node[propertyName] = this.value;
-    }
-};
-
 /**
  * Creates a unary function that invokes `func` with its argument transformed.
  *
@@ -97,7 +18,6 @@ function overArg(func, transform) {
   };
 }
 
-/** Built-in value references. */
 var getPrototype = overArg(Object.getPrototypeOf, Object);
 
 /**
@@ -128,7 +48,6 @@ function isObjectLike(value) {
   return value != null && typeof value == 'object';
 }
 
-/** `Object#toString` result references. */
 var objectTag = '[object Object]';
 
 /** Used for built-in method references. */
@@ -209,10 +128,8 @@ function isPrototype(value) {
   return value === proto;
 }
 
-/* Built-in method references for those with the same name as other `lodash` methods. */
 var nativeKeys = overArg(Object.keys, Object);
 
-/** Used for built-in method references. */
 var objectProto$2 = Object.prototype;
 
 /** Used to check objects for own properties. */
@@ -268,7 +185,6 @@ function isObject(value) {
   return value != null && (type == 'object' || type == 'function');
 }
 
-/** `Object#toString` result references. */
 var funcTag = '[object Function]';
 var genTag = '[object GeneratorFunction]';
 var proxyTag = '[object Proxy]';
@@ -310,16 +226,13 @@ function isFunction(value) {
 /** Detect free variable `global` from Node.js. */
 var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
 
-/** Detect free variable `self`. */
 var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
 
 /** Used as a reference to the global object. */
-var root$1 = freeGlobal || freeSelf || Function('return this')();
+var root = freeGlobal || freeSelf || Function('return this')();
 
-/** Used to detect overreaching core-js shims. */
-var coreJsData = root$1['__core-js_shared__'];
+var coreJsData = root['__core-js_shared__'];
 
-/** Used to detect methods masquerading as native. */
 var maskSrcKey = (function() {
   var uid = /[^.]+$/.exec(coreJsData && coreJsData.keys && coreJsData.keys.IE_PROTO || '');
   return uid ? ('Symbol(src)_1.' + uid) : '';
@@ -361,10 +274,6 @@ function toSource(func) {
   return '';
 }
 
-/**
- * Used to match `RegExp`
- * [syntax characters](http://ecma-international.org/ecma-262/7.0/#sec-patterns).
- */
 var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
 
 /** Used to detect host constructors (Safari). */
@@ -414,33 +323,20 @@ function getValue(object, key) {
   return object == null ? undefined : object[key];
 }
 
-/**
- * Gets the native function at `key` of `object`.
- *
- * @private
- * @param {Object} object The object to query.
- * @param {string} key The key of the method to get.
- * @returns {*} Returns the function if it's native, else `undefined`.
- */
 function getNative(object, key) {
   var value = getValue(object, key);
   return baseIsNative(value) ? value : undefined;
 }
 
-/* Built-in method references that are verified to be native. */
-var DataView = getNative(root$1, 'DataView');
+var DataView = getNative(root, 'DataView');
 
-/* Built-in method references that are verified to be native. */
-var Map = getNative(root$1, 'Map');
+var Map = getNative(root, 'Map');
 
-/* Built-in method references that are verified to be native. */
-var Promise$1 = getNative(root$1, 'Promise');
+var Promise$1 = getNative(root, 'Promise');
 
-/* Built-in method references that are verified to be native. */
-var Set = getNative(root$1, 'Set');
+var Set = getNative(root, 'Set');
 
-/* Built-in method references that are verified to be native. */
-var WeakMap = getNative(root$1, 'WeakMap');
+var WeakMap = getNative(root, 'WeakMap');
 
 /** Used for built-in method references. */
 var objectProto$7 = Object.prototype;
@@ -463,7 +359,6 @@ function baseGetTag(value) {
   return objectToString$3.call(value);
 }
 
-/** `Object#toString` result references. */
 var mapTag$1 = '[object Map]';
 var objectTag$1 = '[object Object]';
 var promiseTag = '[object Promise]';
@@ -524,7 +419,6 @@ if ((DataView && getTag(new DataView(new ArrayBuffer(1))) != dataViewTag) ||
 
 var getTag$1 = getTag;
 
-/** `Object#toString` result references. */
 var argsTag = '[object Arguments]';
 
 /** Used for built-in method references. */
@@ -548,7 +442,6 @@ function baseIsArguments(value) {
   return isObjectLike(value) && objectToString$4.call(value) == argsTag;
 }
 
-/** Used for built-in method references. */
 var objectProto$8 = Object.prototype;
 
 /** Used to check objects for own properties. */
@@ -639,31 +532,6 @@ function isLength(value) {
     value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
 }
 
-/**
- * Checks if `value` is array-like. A value is considered array-like if it's
- * not a function and has a `value.length` that's an integer greater than or
- * equal to `0` and less than or equal to `Number.MAX_SAFE_INTEGER`.
- *
- * @static
- * @memberOf _
- * @since 4.0.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is array-like, else `false`.
- * @example
- *
- * _.isArrayLike([1, 2, 3]);
- * // => true
- *
- * _.isArrayLike(document.body.children);
- * // => true
- *
- * _.isArrayLike('abc');
- * // => true
- *
- * _.isArrayLike(_.noop);
- * // => false
- */
 function isArrayLike(value) {
   return value != null && isLength(value.length) && !isFunction(value);
 }
@@ -685,7 +553,6 @@ function stubFalse() {
   return false;
 }
 
-/** Detect free variable `exports`. */
 var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
@@ -695,7 +562,7 @@ var freeModule = freeExports && typeof module == 'object' && module && !module.n
 var moduleExports = freeModule && freeModule.exports === freeExports;
 
 /** Built-in value references. */
-var Buffer = moduleExports ? root$1.Buffer : undefined;
+var Buffer = moduleExports ? root.Buffer : undefined;
 
 /* Built-in method references for those with the same name as other `lodash` methods. */
 var nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined;
@@ -719,7 +586,6 @@ var nativeIsBuffer = Buffer ? Buffer.isBuffer : undefined;
  */
 var isBuffer = nativeIsBuffer || stubFalse;
 
-/** `Object#toString` result references. */
 var argsTag$1 = '[object Arguments]';
 var arrayTag = '[object Array]';
 var boolTag = '[object Boolean]';
@@ -797,7 +663,6 @@ function baseUnary(func) {
   };
 }
 
-/** Detect free variable `exports`. */
 var freeExports$1 = typeof exports == 'object' && exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
@@ -816,7 +681,6 @@ var nodeUtil = (function() {
   } catch (e) {}
 }());
 
-/* Node.js helper references. */
 var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
 
 /**
@@ -838,7 +702,6 @@ var nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
  */
 var isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedArray;
 
-/** `Object#toString` result references. */
 var mapTag = '[object Map]';
 var setTag = '[object Set]';
 
@@ -928,7 +791,7 @@ var isChild = function isChild(child) {
 	return isVirtualNode(child) || isVirtualText(child) || isWidget(child) || isThunk(child);
 };
 
-function VirtualNode(tagName, properties, children, key, namespace) {
+function VirtualNode(tagName, properties, children, key, namespace, event) {
     this.tagName = tagName;
     this.properties = properties || {};
     this.children = children || [];
@@ -989,6 +852,7 @@ function VirtualNode(tagName, properties, children, key, namespace) {
     this.hasThunks = hasThunks;
     this.hooks = hooks;
     this.descendantHooks = descendantHooks;
+    this.event = event;
 }
 
 function VirtualText(text) {
@@ -1018,21 +882,6 @@ function errorString(obj) {
         return String(obj);
     }
 }
-
-var transformProperties = (function (props) {
-
-    for (var propName in props) {
-        if (props.hasOwnProperty(propName)) {
-            var value = props[propName];
-            if (isHook(value)) {
-                continue;
-            }
-            if (propName.substr(0, 3) === 'ev-') {
-                props[propName] = eventHook(value);
-            }
-        }
-    }
-});
 
 var getChildNodes = function getChildNodes(child, childNodes) {
     var tempChildNodes = Array.from(childNodes);
@@ -1258,6 +1107,7 @@ var set = function set(object, property, value, receiver) {
   return value;
 };
 
+// import { SoftSetHook } from '../ev-store';
 var createVirtualNode = (function (tagName) {
 
     return function () {
@@ -1269,6 +1119,7 @@ var createVirtualNode = (function (tagName) {
         var item = void 0;
         var i = void 0;
         var allChildNodes = void 0;
+        var event = false;
 
         for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
             args[_key] = arguments[_key];
@@ -1277,13 +1128,27 @@ var createVirtualNode = (function (tagName) {
         for (i = 0; i < args.length; i++) {
             item = args[i] || {};
 
-            //Check if text node
+            // Check if item is a text node.
             if (typeof item === 'string' || typeof item === 'number') {
                 children.push(item);
+
+                // Check if item is a child.
             } else if (item !== null && item.hasOwnProperty('descendantHooks')) {
                 children.push(item);
+
+                // Check if item is a properties object.
             } else if (isPlainObject(item)) {
-                props = item;
+
+                // Check if it has the event property.
+                if (item.hasOwnProperty('event')) {
+                    event = item.event;
+                    delete item.event;
+                }
+
+                // Check if properties is not empty.
+                if (!isEmpty(item)) {
+                    props = item;
+                }
             }
 
             // Check if Loop of children 
@@ -1320,15 +1185,15 @@ var createVirtualNode = (function (tagName) {
                     }
                 });
             }
-            props.value = softSetHook(props.value);
+            // props.value = softSetHook(props.value);
         }
-        if (!isEmpty(props)) {
-            transformProperties(props);
-        }
+        // if (!isEmpty(props)) {
+        //     transformProperties(props);
+        // }
 
         allChildNodes = getChildNodes(children, childNodes);
 
-        return new VirtualNode(tagName, props, allChildNodes, key, namespace);
+        return new VirtualNode(tagName, props, allChildNodes, key, namespace, event);
     };
 });
 
@@ -1356,6 +1221,95 @@ function internal$1(data, callback, supportData) {
 
 function or(data, inner, supportData) {
 	return internal$1.apply(this, [data, inner, supportData]);
+}
+
+/**
+ * Pass a condition once with a given reference.
+ * @param {string} reference - A unique reference per conditon.
+ * @return {Boolean}
+ */
+function once(reference) {
+    if (!once.prototype.references) {
+        once.prototype.references = {};
+    }
+    // Store reference if dosen't exist.
+    if (!once.prototype.references.hasOwnProperty(reference)) {
+        once.prototype.references[reference] = null;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+var eventStore$1 = {};
+/*
+ * An eventReference is meant only for an element
+ * or elements that may co-exist as the same element between patches 
+ */
+var storeEventTarget = function storeEventTarget(HTMLElement, eventReference) {
+	var i = void 0;
+
+	if (!eventStore$1.hasOwnProperty(eventReference)) {
+		eventStore$1[eventReference] = [HTMLElement];
+	} else {
+		var eventStoreRef = eventStore$1[eventReference];
+
+		if (!eventStoreRef.includes(HTMLElement)) {
+			eventStore$1.push(HTMLElement);
+		}
+	}
+	// if(once('console.log.eventStore')){
+	// 	console.info('eventStore registry', eventStore);
+	// 	HTMLElement.addEventListener('click',function(){
+	// 		alert('test')
+	// 	},false)		
+	// }
+};
+
+function create(virtualNode, opts) {
+    var doc = opts ? opts.document || document : document;
+    var warn = opts ? opts.warn : null;
+    var i = void 0;
+    var node = void 0;
+    var children = void 0;
+    var childNode = void 0;
+    var vnode = virtualNode;
+    var virtualNodeEvent = virtualNode.event;
+
+    vnode = handleThunk(virtualNode).a;
+
+    if (isWidget(vnode)) {
+        return vnode.init();
+    } else if (isVirtualText(vnode)) {
+        return doc.createTextNode(vnode.text);
+    } else if (!isVirtualNode(vnode)) {
+        if (warn) {
+            warn("Item is not a valid virtual dom node", vnode);
+        }
+        return null;
+    }
+
+    if (vnode.namespace === null) {
+        node = doc.createElement(vnode.tagName);
+        if (virtualNodeEvent) {
+            storeEventTarget(node, virtualNodeEvent);
+        }
+    } else {
+        node = doc.createElementNS(vnode.namespace, vnode.tagName);
+    }
+
+    applyProperties(node, vnode.properties);
+
+    children = vnode.children;
+
+    for (i = 0; i < children.length; i++) {
+        childNode = create(children[i], opts);
+        if (childNode) {
+            node.appendChild(childNode);
+        }
+    }
+
+    return node;
 }
 
 var handleThunk = function handleThunk(a, b) {
@@ -1388,48 +1342,6 @@ var applyProperties = function applyProperties(node, props, previous) {
         }
     }
 };
-
-function create(virtualNode, opts) {
-    var doc = opts ? opts.document || document : document;
-    var warn = opts ? opts.warn : null;
-    var i = void 0;
-    var node = void 0;
-    var children = void 0;
-    var childNode = void 0;
-    var vnode = virtualNode;
-
-    vnode = handleThunk(virtualNode).a;
-
-    if (isWidget(vnode)) {
-        return vnode.init();
-    } else if (isVirtualText(vnode)) {
-        return doc.createTextNode(vnode.text);
-    } else if (!isVirtualNode(vnode)) {
-        if (warn) {
-            warn("Item is not a valid virtual dom node", vnode);
-        }
-        return null;
-    }
-
-    if (vnode.namespace === null) {
-        node = doc.createElement(vnode.tagName);
-    } else {
-        node = doc.createElementNS(vnode.namespace, vnode.tagName);
-    }
-
-    applyProperties(node, vnode.properties);
-
-    children = vnode.children;
-
-    for (i = 0; i < children.length; i++) {
-        childNode = create(children[i], opts);
-        if (childNode) {
-            node.appendChild(childNode);
-        }
-    }
-
-    return node;
-}
 
 var patchObject = function patchObject(node, props, previous, propName, propValue) {
     var previousValue = previous ? previous[propName] : undefined;

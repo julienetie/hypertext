@@ -1,7 +1,7 @@
 import { isHook, isWidget, isThunk, isVirtualNode } from './conditions';
 import version from './version';
 
-export function VirtualNode(tagName, properties, children, key, namespace) {
+export function VirtualNode(tagName, properties, children, key, namespace, event) {
     this.tagName = tagName;
     this.properties = properties || {};
     this.children = children || [];
@@ -62,6 +62,9 @@ export function VirtualNode(tagName, properties, children, key, namespace) {
     this.hasThunks = hasThunks;
     this.hooks = hooks;
     this.descendantHooks = descendantHooks;
+    this.event = event; 
+
+    
 }
 
 export function VirtualText(text) {

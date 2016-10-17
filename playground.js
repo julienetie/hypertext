@@ -37,9 +37,9 @@ var a = assembly('a');
 
 		var helloWorld =
 		    createNodes(
-		        div({ class: 'hello', id: 'world' },
+		        div({ class: 'hello', id: 'world', event: 'outer-div'},
 		            h1('Hello World!'),
-		            p('This is Hypertext'),
+		            p({ event: 'paragraph'},'This is Hypertext'),
 		            figure({ class: 'img-section' },
 		                figcaption('This is random Art'),
 		                img({ alt: 'Banksy', src: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Banksy-art.jpg/220px-Banksy-art.jpg' }),
@@ -47,6 +47,7 @@ var a = assembly('a');
 		            )
 		        )
 		    )
+		    console.log(helloWorld)
 		document.body.appendChild(helloWorld);
 
 
