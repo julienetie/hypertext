@@ -853,6 +853,7 @@ function VirtualNode(tagName, properties, children, key, namespace, event) {
     this.hooks = hooks;
     this.descendantHooks = descendantHooks;
     this.event = event;
+    this.virtualNode = true;
 }
 
 function VirtualText(text) {
@@ -1107,7 +1108,6 @@ var set = function set(object, property, value, receiver) {
   return value;
 };
 
-// import { SoftSetHook } from '../ev-store';
 var createVirtualNode = (function (tagName) {
 
     return function () {
@@ -1133,7 +1133,7 @@ var createVirtualNode = (function (tagName) {
                 children.push(item);
 
                 // Check if item is a child.
-            } else if (item !== null && item.hasOwnProperty('descendantHooks')) {
+            } else if (item !== null && item.hasOwnProperty('virtualNode')) {
                 children.push(item);
 
                 // Check if item is a properties object.
@@ -1185,11 +1185,7 @@ var createVirtualNode = (function (tagName) {
                     }
                 });
             }
-            // props.value = softSetHook(props.value);
         }
-        // if (!isEmpty(props)) {
-        //     transformProperties(props);
-        // }
 
         allChildNodes = getChildNodes(children, childNodes);
 

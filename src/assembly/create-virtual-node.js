@@ -1,11 +1,9 @@
-// import { SoftSetHook } from '../ev-store';
 import isPlainObject from 'lodash-es/isPlainObject';
 import isEmpty  from 'lodash-es/isEmpty';
 import { VirtualNode } from '../virtual-node';
 import version from '../version';
 import { UnsupportedValueType } from '../validation';
 import { isHook } from '../conditions';
-// import transformProperties from './transform-properties';
 import getChildNodes from './get-child-nodes';
 
 var eventStore = [];
@@ -31,7 +29,7 @@ export default (tagName) => {
                 children.push(item);
 
             // Check if item is a child.
-            } else if (item !== null && item.hasOwnProperty('descendantHooks')) {
+            } else if (item !== null && item.hasOwnProperty('virtualNode')) {
                 children.push(item);
 
             // Check if item is a properties object.
@@ -90,11 +88,8 @@ export default (tagName) => {
                     }
                 });
             }
-            // props.value = softSetHook(props.value);
         }
-        // if (!isEmpty(props)) {
-        //     transformProperties(props);
-        // }
+
 
         allChildNodes = getChildNodes(children, childNodes);
 

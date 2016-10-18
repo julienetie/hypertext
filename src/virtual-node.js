@@ -63,6 +63,7 @@ export function VirtualNode(tagName, properties, children, key, namespace, event
     this.hooks = hooks;
     this.descendantHooks = descendantHooks;
     this.event = event; 
+    this.virtualNode = true; 
 
     
 }
