@@ -1243,10 +1243,6 @@ function once(reference) {
 
 var eventStore$1 = {};
 
-/*
- * An eventReference is meant only for an element
- * or elements that may co-exist as the same element between patches 
- */
 var storeEventTarget = function storeEventTarget(HTMLElement, eventReference) {
 	var i = void 0;
 
@@ -1323,14 +1319,17 @@ var handleThunk = function handleThunk(a, b) {
 var applyProperties = function applyProperties(node, props, previous) {
     var propName = void 0;
     var propValue = void 0;
+    var isPropHook = void 0;
 
     for (propName in props) {
         propValue = props[propName];
+        isPropHook = isHook(propValue);
 
-        if (propValue === undefined) {
+        if (propValue === undefined || isPropHook) {
             removeProperty(node, propName, propValue, previous);
-        } else if (isHook(propValue)) {
-            removeProperty(node, propName, propValue, previous);
+        }
+
+        if (isPropHook) {
             if (propValue.hook) {
                 propValue.hook(node, propName, previous ? previous[propName] : undefined);
             }
@@ -1338,6 +1337,7 @@ var applyProperties = function applyProperties(node, props, previous) {
             if (isPlainObject(propValue)) {
                 patchObject(node, props, previous, propName, propValue);
             } else {
+                propName = propName === 'class' ? 'className' : propName;
                 node[propName] = propValue;
             }
         }
@@ -1410,6 +1410,7 @@ exports.assembly = createVirtualNode;
 exports.loop = loop;
 exports.or = or;
 exports.createNodes = createNodes;
+exports.eventStore = eventStore$1;
 
 Object.defineProperty(exports, '__esModule', { value: true });
 

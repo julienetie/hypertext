@@ -62,24 +62,30 @@ const handleThunk = (a, b) => {
 const applyProperties = (node, props, previous) => {
     let propName;
     let propValue;
+    let isPropHook;
 
     for (propName in props) {
-        propValue = props[propName]
+        propValue = props[propName];
+        isPropHook = isHook(propValue);
 
-        if (propValue === undefined) {
+        if (propValue === undefined || isPropHook) {
             removeProperty(node, propName, propValue, previous);
-        } else if (isHook(propValue)) {
-            removeProperty(node, propName, propValue, previous)
+        } 
+
+        if (isPropHook) {
             if (propValue.hook) {
-                propValue.hook(node,
+                propValue.hook(
+                    node,
                     propName,
-                    previous ? previous[propName] : undefined)
+                    previous ? previous[propName] : undefined
+                    );
             }
         } else {
             if (isPlainObject(propValue)) {
                 patchObject(node, props, previous, propName, propValue);
             } else {
-                node[propName] = propValue
+                propName = propName === 'class' ? 'className' : propName;
+                node[propName] = propValue;
             }
         }
     }

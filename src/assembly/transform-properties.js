@@ -1,5 +1,5 @@
 // import { eventHook } from '../ev-store';
-// import { isHook } from '../conditions';
+import { isHook } from '../conditions';
 
 export default (props, vNode) => {
 
@@ -7,7 +7,7 @@ export default (props, vNode) => {
         if (props.hasOwnProperty(propName)) {
             let value = props[propName];
             if (isHook(value)) {
-                console.log(propName,value)
+                console.log('isHook',propName,value)
                 continue;
             }
             // if (propName.substr(0, 3) === 'ev-') {
