@@ -1,6 +1,6 @@
 import { assembly, loop, or } from './assembly';
 import create from './create';
-import eventStore from './events/eventStore';
+import eventStore from './events/event-store';
 
 window.a = assembly('a');
 window.abbr = assembly('abbr');

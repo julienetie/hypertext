@@ -45,7 +45,7 @@ export default (tagName) => {
 
                 // Check if properties is not empty.
                 if(!isEmpty(item)){
-                    props = item;             
+                    props = item;     console.log(item)        
                 }
 
             }
