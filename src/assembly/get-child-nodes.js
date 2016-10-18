@@ -1,6 +1,6 @@
 import isArray from 'lodash-es/isArray';
 import { isChild } from '../conditions';
-import { VirtualText } from '../virtual-node';
+import { VirtualText } from './virtual-node';
 import { UnexpectedVirtualElement } from '../validation';
 
 const getChildNodes = (child, childNodes) => {

@@ -1,6 +1,6 @@
 import isPlainObject from 'lodash-es/isPlainObject';
 import isEmpty  from 'lodash-es/isEmpty';
-import { VirtualNode } from '../virtual-node';
+import { VirtualNode } from './virtual-node';
 import version from '../version';
 import { UnsupportedValueType } from '../validation';
 import { isHook } from '../conditions';
