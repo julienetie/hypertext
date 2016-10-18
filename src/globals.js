@@ -1,6 +1,6 @@
 import { assembly, loop, or } from './assembly';
 import create from './create';
-
+import eventStore from './events/eventStore';
 
 window.a = assembly('a');
 window.abbr = assembly('abbr');
@@ -107,5 +107,6 @@ window.video = assembly('video');
 window.createNodes = create;
 window.loop = loop;
 window.or = or;
+window.eventStore = eventStore;
 
  

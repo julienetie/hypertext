@@ -1,5 +1,6 @@
 import { assembly, loop, or } from './assembly';
 import create from './create';
+import eventStore from './events/eventStore';
 
 
 export const a = assembly('a');
@@ -105,4 +106,4 @@ export const video = assembly('video');
 
 // Create API
 const createNodes = create;
-export { assembly, loop, or, createNodes }
+export { assembly, loop, or, createNodes, eventStore }

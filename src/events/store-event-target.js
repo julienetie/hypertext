@@ -1,5 +1,6 @@
 import once from '../utils';
-let eventStore = {};
+import eventStore from './event-store';
+
 /*
  * An eventReference is meant only for an element
  * or elements that may co-exist as the same element between patches 
@@ -16,12 +17,12 @@ const storeEventTarget = (HTMLElement, eventReference) => {
 			eventStore.push(HTMLElement);
 		}
 	}
-	// if(once('console.log.eventStore')){
-	// 	console.info('eventStore registry', eventStore);
-	// 	HTMLElement.addEventListener('click',function(){
-	// 		alert('test')
-	// 	},false)		
-	// }
+	if(once('console.log.eventStore')){
+		console.info('eventStore registry', eventStore);
+		HTMLElement.addEventListener('click',function(){
+			alert('test')
+		},false)		
+	}
 }
-
+ 
 export default storeEventTarget;

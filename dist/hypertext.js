@@ -1242,6 +1242,7 @@ function once(reference) {
 }
 
 var eventStore$1 = {};
+
 /*
  * An eventReference is meant only for an element
  * or elements that may co-exist as the same element between patches 
@@ -1258,12 +1259,12 @@ var storeEventTarget = function storeEventTarget(HTMLElement, eventReference) {
 			eventStore$1.push(HTMLElement);
 		}
 	}
-	// if(once('console.log.eventStore')){
-	// 	console.info('eventStore registry', eventStore);
-	// 	HTMLElement.addEventListener('click',function(){
-	// 		alert('test')
-	// 	},false)		
-	// }
+	if (once('console.log.eventStore')) {
+		console.info('eventStore registry', eventStore$1);
+		HTMLElement.addEventListener('click', function () {
+			alert('test');
+		}, false);
+	}
 };
 
 function create(virtualNode, opts) {
