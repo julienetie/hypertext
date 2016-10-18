@@ -51,9 +51,6 @@ var a = assembly('a');
 		document.body.appendChild(helloWorld);
 
 
-
-
-
 /** 
  * ***************************************
  * Example 2:    Hypertext with Virtual DOM     
