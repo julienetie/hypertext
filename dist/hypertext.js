@@ -1255,12 +1255,11 @@ var storeEventTarget = function storeEventTarget(HTMLElement, eventReference) {
 			eventStore$1.push(HTMLElement);
 		}
 	}
-	if (once('console.log.eventStore')) {
-		console.info('eventStore registry', eventStore$1);
-		HTMLElement.addEventListener('click', function () {
-			alert('test');
-		}, false);
-	}
+	// if(once('console.log.eventStore' + eventReference)){
+	// 	HTMLElement.addEventListener('click',function(){
+	// 		console.log('test',HTMLElement)
+	// 	},false)		
+	// }
 };
 
 function create(virtualNode, opts) {

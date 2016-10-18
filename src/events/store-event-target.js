@@ -17,12 +17,11 @@ const storeEventTarget = (HTMLElement, eventReference) => {
 			eventStore.push(HTMLElement);
 		}
 	}
-	if(once('console.log.eventStore')){
-		console.info('eventStore registry', eventStore);
-		HTMLElement.addEventListener('click',function(){
-			alert('test')
-		},false)		
-	}
+	// if(once('console.log.eventStore' + eventReference)){
+	// 	HTMLElement.addEventListener('click',function(){
+	// 		console.log('test',HTMLElement)
+	// 	},false)		
+	// }
 }
  
 export default storeEventTarget;
