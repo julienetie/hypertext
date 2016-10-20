@@ -1,3 +1,28 @@
+if (typeof Object.assign != 'function') {
+  (function () {
+    Object.assign = function (target) {
+      'use strict';
+      // We must check against these specific cases.
+      if (target === undefined || target === null) {
+        throw new TypeError('Cannot convert undefined or null to object');
+      }
+
+      var output = Object(target);
+      for (var index = 1; index < arguments.length; index++) {
+        var source = arguments[index];
+        if (source !== undefined && source !== null) {
+          for (var nextKey in source) {
+            if (source.hasOwnProperty(nextKey)) {
+              output[nextKey] = source[nextKey];
+            }
+          }
+        }
+      }
+      return output;
+    };
+  })();
+}
+
 /*
  * Hypertext v0.0.1 (Alpha)
  *
@@ -25,6 +50,7 @@ var figcaption = assembly('figcaption');
 var ul = assembly('ul');
 var li = assembly('li');
 var a = assembly('a');
+var input = assembly('INPUT');
 
 
 
@@ -39,6 +65,7 @@ var a = assembly('a');
 		    createNodes(
 		        div({ class: 'hello', id: 'world', event: 'outer-div'},
 		            h1('Hello World!'),
+		            input({value: 235235, placeholder: 'This is a placeholder'}),
 		            p({ event: 'paragraph'},'This is Hypertext'),
 		            figure({ class: 'img-section' },
 		                figcaption('This is random Art'),
@@ -47,7 +74,7 @@ var a = assembly('a');
 		            )
 		        )
 		    )
-		    console.log(helloWorld)
+		    // console.log(helloWorld)
 		document.body.appendChild(helloWorld);
 
 

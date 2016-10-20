@@ -2,7 +2,6 @@ import isPlainObject from 'lodash-es/isPlainObject';
 import isEmpty  from 'lodash-es/isEmpty';
 import { VirtualNode } from './virtual-node';
 import version from '../version';
-import { UnsupportedValueType } from '../validation';
 import { isHook } from '../conditions';
 import getChildNodes from './get-child-nodes';
 
@@ -70,26 +69,6 @@ export default (tagName) => {
             namespace = props.namespace;
             props.namespace = undefined;
         }
-
-        // fix cursor bug
-        if (tagName === 'INPUT' &&
-            !namespace &&
-            props.hasOwnProperty('value') &&
-            props.value !== undefined &&
-            !isHook(props.value)
-        ) {
-            if (props.value !== null && typeof props.value !== 'string') {
-                throw UnsupportedValueType({
-                    expected: 'String',
-                    received: typeof props.value,
-                    Vnode: {
-                        tagName: tagName,
-                        properties: props
-                    }
-                });
-            }
-        }
-
 
         allChildNodes = getChildNodes(children, childNodes);
 

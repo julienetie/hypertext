@@ -7,7 +7,7 @@ export function VirtualNode(tagName, properties, children, key, namespace, event
     this.children = children || [];
     this.key = key != null ? key + '' : undefined;
     this.namespace = (typeof namespace === "string") ? namespace : null;
-console.log(tagName) 
+
     const count = (children && children.length) || 0;
     let descendants = 0;
     let hasWidgets = false;

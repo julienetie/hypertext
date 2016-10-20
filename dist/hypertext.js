@@ -355,7 +355,7 @@ var DataView = getNative(root, 'DataView');
 var Map = getNative(root, 'Map');
 
 /* Built-in method references that are verified to be native. */
-var Promise$1 = getNative(root, 'Promise');
+var Promise = getNative(root, 'Promise');
 
 /* Built-in method references that are verified to be native. */
 var Set = getNative(root, 'Set');
@@ -406,7 +406,7 @@ var objectToString$1 = objectProto$4.toString;
 /** Used to detect maps, sets, and weakmaps. */
 var dataViewCtorString = toSource(DataView);
 var mapCtorString = toSource(Map);
-var promiseCtorString = toSource(Promise$1);
+var promiseCtorString = toSource(Promise);
 var setCtorString = toSource(Set);
 var weakMapCtorString = toSource(WeakMap);
 
@@ -422,7 +422,7 @@ var getTag = baseGetTag;
 // Fallback for data views, maps, sets, and weak maps in IE 11 and promises in Node.js < 6.
 if ((DataView && getTag(new DataView(new ArrayBuffer(1))) != dataViewTag) ||
     (Map && getTag(new Map) != mapTag$1) ||
-    (Promise$1 && getTag(Promise$1.resolve()) != promiseTag) ||
+    (Promise && getTag(Promise.resolve()) != promiseTag) ||
     (Set && getTag(new Set) != setTag$1) ||
     (WeakMap && getTag(new WeakMap) != weakMapTag)) {
   getTag = function(value) {
@@ -855,7 +855,7 @@ function VirtualNode(tagName, properties, children, key, namespace, event) {
     this.children = children || [];
     this.key = key != null ? key + '' : undefined;
     this.namespace = typeof namespace === "string" ? namespace : null;
-    console.log(tagName);
+
     var count = children && children.length || 0;
     var descendants = 0;
     var hasWidgets = false;
@@ -923,25 +923,6 @@ VirtualNode.prototype.type = "VirtualNode";
 VirtualText.prototype.version = version;
 VirtualText.prototype.type = "VirtualText";
 
-function UnsupportedValueType(data) {
-    var err = new Error();
-
-    err.type = 'virtual-hyperscript.unsupported.value-type';
-    err.message = 'Unexpected value type for input passed to h().\n' + 'Expected a ' + errorString(data.expected) + ' but got:\n' + errorString(data.received) + '.\n' + 'The vnode is:\n' + errorString(data.Vnode);
-    '\n' + 'Suggested fix: Cast the value passed to h() to a string using String(value).';
-    err.Vnode = data.Vnode;
-
-    return err;
-}
-
-function errorString(obj) {
-    try {
-        return JSON.stringify(obj, null, '    ');
-    } catch (e) {
-        return String(obj);
-    }
-}
-
 var getChildNodes = function getChildNodes(child, childNodes) {
     var tempChildNodes = Array.from(childNodes);
 
@@ -954,216 +935,8 @@ var getChildNodes = function getChildNodes(child, childNodes) {
         for (var i = 0; i < childLength; i++) {
             tempChildNodes.push(getChildNodes(child[i], childNodes)[0]);
         }
-    } else {
-        // throw UnexpectedVirtualElement({
-        //     foreignObject: child,
-        //     parentVnode: {
-        //         tagName: tag,
-        //         properties: props
-        //     }
-        // });
     }
     return tempChildNodes;
-};
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
-
-
-
-
-
-var asyncGenerator = function () {
-  function AwaitValue(value) {
-    this.value = value;
-  }
-
-  function AsyncGenerator(gen) {
-    var front, back;
-
-    function send(key, arg) {
-      return new Promise(function (resolve, reject) {
-        var request = {
-          key: key,
-          arg: arg,
-          resolve: resolve,
-          reject: reject,
-          next: null
-        };
-
-        if (back) {
-          back = back.next = request;
-        } else {
-          front = back = request;
-          resume(key, arg);
-        }
-      });
-    }
-
-    function resume(key, arg) {
-      try {
-        var result = gen[key](arg);
-        var value = result.value;
-
-        if (value instanceof AwaitValue) {
-          Promise.resolve(value.value).then(function (arg) {
-            resume("next", arg);
-          }, function (arg) {
-            resume("throw", arg);
-          });
-        } else {
-          settle(result.done ? "return" : "normal", result.value);
-        }
-      } catch (err) {
-        settle("throw", err);
-      }
-    }
-
-    function settle(type, value) {
-      switch (type) {
-        case "return":
-          front.resolve({
-            value: value,
-            done: true
-          });
-          break;
-
-        case "throw":
-          front.reject(value);
-          break;
-
-        default:
-          front.resolve({
-            value: value,
-            done: false
-          });
-          break;
-      }
-
-      front = front.next;
-
-      if (front) {
-        resume(front.key, front.arg);
-      } else {
-        back = null;
-      }
-    }
-
-    this._invoke = send;
-
-    if (typeof gen.return !== "function") {
-      this.return = undefined;
-    }
-  }
-
-  if (typeof Symbol === "function" && Symbol.asyncIterator) {
-    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
-      return this;
-    };
-  }
-
-  AsyncGenerator.prototype.next = function (arg) {
-    return this._invoke("next", arg);
-  };
-
-  AsyncGenerator.prototype.throw = function (arg) {
-    return this._invoke("throw", arg);
-  };
-
-  AsyncGenerator.prototype.return = function (arg) {
-    return this._invoke("return", arg);
-  };
-
-  return {
-    wrap: function (fn) {
-      return function () {
-        return new AsyncGenerator(fn.apply(this, arguments));
-      };
-    },
-    await: function (value) {
-      return new AwaitValue(value);
-    }
-  };
-}();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var get = function get(object, property, receiver) {
-  if (object === null) object = Function.prototype;
-  var desc = Object.getOwnPropertyDescriptor(object, property);
-
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent === null) {
-      return undefined;
-    } else {
-      return get(parent, property, receiver);
-    }
-  } else if ("value" in desc) {
-    return desc.value;
-  } else {
-    var getter = desc.get;
-
-    if (getter === undefined) {
-      return undefined;
-    }
-
-    return getter.call(receiver);
-  }
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-var set = function set(object, property, value, receiver) {
-  var desc = Object.getOwnPropertyDescriptor(object, property);
-
-  if (desc === undefined) {
-    var parent = Object.getPrototypeOf(object);
-
-    if (parent !== null) {
-      set(parent, property, value, receiver);
-    }
-  } else if ("value" in desc && desc.writable) {
-    desc.value = value;
-  } else {
-    var setter = desc.set;
-
-    if (setter !== undefined) {
-      setter.call(receiver, value);
-    }
-  }
-
-  return value;
 };
 
 var createVirtualNode = (function (tagName) {
@@ -1229,20 +1002,6 @@ var createVirtualNode = (function (tagName) {
         if (props.hasOwnProperty('namespace')) {
             namespace = props.namespace;
             props.namespace = undefined;
-        }
-
-        // fix cursor bug
-        if (tagName === 'INPUT' && !namespace && props.hasOwnProperty('value') && props.value !== undefined && !isHook(props.value)) {
-            if (props.value !== null && typeof props.value !== 'string') {
-                throw UnsupportedValueType({
-                    expected: 'String',
-                    received: _typeof(props.value),
-                    Vnode: {
-                        tagName: tagName,
-                        properties: props
-                    }
-                });
-            }
         }
 
         allChildNodes = getChildNodes(children, childNodes);
@@ -1460,6 +1219,93 @@ var removeProperty = function removeProperty(node, propName, propValue, previous
         }
     }
 };
+
+var arrayFrom = function () {
+  // Production steps of ECMA-262, Edition 6, 22.1.2.1
+  // Reference: https://people.mozilla.org/~jorendorff/es6-draft.html#sec-array.from
+  if (!Array.from) {
+    Array.from = function () {
+      var toStr = Object.prototype.toString;
+      var isCallable = function isCallable(fn) {
+        return typeof fn === 'function' || toStr.call(fn) === '[object Function]';
+      };
+      var toInteger = function toInteger(value) {
+        var number = Number(value);
+        if (isNaN(number)) {
+          return 0;
+        }
+        if (number === 0 || !isFinite(number)) {
+          return number;
+        }
+        return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
+      };
+      var maxSafeInteger = Math.pow(2, 53) - 1;
+      var toLength = function toLength(value) {
+        var len = toInteger(value);
+        return Math.min(Math.max(len, 0), maxSafeInteger);
+      };
+
+      // The length property of the from method is 1.
+      return function from(arrayLike /*, mapFn, thisArg */) {
+        // 1. Let C be the this value.
+        var C = this;
+
+        // 2. Let items be ToObject(arrayLike).
+        var items = Object(arrayLike);
+
+        // 3. ReturnIfAbrupt(items).
+        if (arrayLike == null) {
+          throw new TypeError("Array.from requires an array-like object - not null or undefined");
+        }
+
+        // 4. If mapfn is undefined, then let mapping be false.
+        var mapFn = arguments.length > 1 ? arguments[1] : void undefined;
+        var T;
+        if (typeof mapFn !== 'undefined') {
+          // 5. else
+          // 5. a If IsCallable(mapfn) is false, throw a TypeError exception.
+          if (!isCallable(mapFn)) {
+            throw new TypeError('Array.from: when provided, the second argument must be a function');
+          }
+
+          // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
+          if (arguments.length > 2) {
+            T = arguments[2];
+          }
+        }
+
+        // 10. Let lenValue be Get(items, "length").
+        // 11. Let len be ToLength(lenValue).
+        var len = toLength(items.length);
+
+        // 13. If IsConstructor(C) is true, then
+        // 13. a. Let A be the result of calling the [[Construct]] internal method of C with an argument list containing the single item len.
+        // 14. a. Else, Let A be ArrayCreate(len).
+        var A = isCallable(C) ? Object(new C(len)) : new Array(len);
+
+        // 16. Let k be 0.
+        var k = 0;
+        // 17. Repeat, while k < len… (also steps a - h)
+        var kValue;
+        while (k < len) {
+          kValue = items[k];
+          if (mapFn) {
+            A[k] = typeof T === 'undefined' ? mapFn(kValue, k) : mapFn.call(T, kValue, k);
+          } else {
+            A[k] = kValue;
+          }
+          k += 1;
+        }
+        // 18. Let putStatus be Put(A, "length", len, true).
+        A.length = len;
+        // 20. Return A.
+        return A;
+      };
+    }();
+  }
+};
+
+arrayFrom();
 
 var createNodes = create;
 
