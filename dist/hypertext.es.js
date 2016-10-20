@@ -849,7 +849,7 @@ function VirtualNode(tagName, properties, children, key, namespace, event) {
     this.children = children || [];
     this.key = key != null ? key + '' : undefined;
     this.namespace = typeof namespace === "string" ? namespace : null;
-    console.log(tagName);
+
     const count = children && children.length || 0;
     let descendants = 0;
     let hasWidgets = false;
@@ -917,25 +917,6 @@ VirtualNode.prototype.type = "VirtualNode";
 VirtualText.prototype.version = version;
 VirtualText.prototype.type = "VirtualText";
 
-function UnsupportedValueType(data) {
-    var err = new Error();
-
-    err.type = 'virtual-hyperscript.unsupported.value-type';
-    err.message = 'Unexpected value type for input passed to h().\n' + 'Expected a ' + errorString(data.expected) + ' but got:\n' + errorString(data.received) + '.\n' + 'The vnode is:\n' + errorString(data.Vnode);
-    '\n' + 'Suggested fix: Cast the value passed to h() to a string using String(value).';
-    err.Vnode = data.Vnode;
-
-    return err;
-}
-
-function errorString(obj) {
-    try {
-        return JSON.stringify(obj, null, '    ');
-    } catch (e) {
-        return String(obj);
-    }
-}
-
 const getChildNodes = (child, childNodes) => {
     let tempChildNodes = Array.from(childNodes);
 
@@ -948,14 +929,6 @@ const getChildNodes = (child, childNodes) => {
         for (let i = 0; i < childLength; i++) {
             tempChildNodes.push(getChildNodes(child[i], childNodes)[0]);
         }
-    } else {
-        // throw UnexpectedVirtualElement({
-        //     foreignObject: child,
-        //     parentVnode: {
-        //         tagName: tag,
-        //         properties: props
-        //     }
-        // });
     }
     return tempChildNodes;
 };
@@ -1019,20 +992,6 @@ var assembly = (tagName => {
         if (props.hasOwnProperty('namespace')) {
             namespace = props.namespace;
             props.namespace = undefined;
-        }
-
-        // fix cursor bug
-        if (tagName === 'INPUT' && !namespace && props.hasOwnProperty('value') && props.value !== undefined && !isHook(props.value)) {
-            if (props.value !== null && typeof props.value !== 'string') {
-                throw UnsupportedValueType({
-                    expected: 'String',
-                    received: typeof props.value,
-                    Vnode: {
-                        tagName: tagName,
-                        properties: props
-                    }
-                });
-            }
         }
 
         allChildNodes = getChildNodes(children, childNodes);
