@@ -115,14 +115,33 @@
 
 const createVTree = (interfaceSelector) => {
   var element;
+  var vTree = {};
   if(interfaceSelector.nodeType){
     element = interfaceSelector;
-    console.log(element)
   }else{
     element = document.querySelector(interfaceSelector);
   }
-  console.log(element)
+
+  function getDefinedAttributes(attributes){
+    const attr = {};
+    const attributesLength = attributes.length;
+    let attribute;
+
+    for(let i = 0; i < attributesLength; i++){
+      attribute = attributes[i];
+      attr[attribute.name] = attribute.value;
+    }
+    return attr;
+  }
+  getDefinedAttributes(element.attributes)
+
+  // Add root node.
+  vTree.tagName = element.tagName;
+  // vTree.properties = 
 }
+
+
+
 
 var test = document.querySelector('.main-wrapper');
 createVTree(test);
