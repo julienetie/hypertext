@@ -17,6 +17,6 @@ export default {
     ],
     targets: [{
         format: 'iife',
-        dest: 'dist/hypertext-not-for-production.min.js'
+        dest: 'demo/hypertext-not-for-production.min.js'
     }, ]
 };
