@@ -1,5 +1,5 @@
 import isArray from 'lodash-es/isArray';
-import { isChild } from '../conditions';
+import { isChild } from '../utilities/conditions';
 import { VirtualText } from './virtual-node';
 
 const getChildNodes = (child, childNodes) => {

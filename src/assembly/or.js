@@ -1,5 +1,5 @@
 import isArray from 'lodash-es/isArray';
-import { isChild } from '../conditions';
+import { isChild } from '../utilities/conditions';
 
 function internal(data, callback, supportData) {
 	let childContainer = callback.apply(this, [data, supportData]);

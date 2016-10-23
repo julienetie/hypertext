@@ -1,4 +1,4 @@
-import { isHook, isWidget, isThunk, isVirtualNode } from '../conditions';
+import { isHook, isWidget, isThunk, isVirtualNode } from '../utilities/conditions';
 import version from '../version';
 
 export function VirtualNode(tagName, properties, children, key, namespace, event) {

@@ -1,4 +1,3 @@
-import once from '../utils';
 import eventStore from './event-store';
 
 /*
@@ -17,11 +16,6 @@ const storeEventTarget = (HTMLElement, eventReference) => {
 			eventStore.push(HTMLElement);
 		}
 	}
-	// if(once('console.log.eventStore' + eventReference)){
-	// 	HTMLElement.addEventListener('click',function(){
-	// 		console.log('test',HTMLElement)
-	// 	},false)		
-	// }
 }
  
 export default storeEventTarget;

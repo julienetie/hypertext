@@ -2,7 +2,7 @@ import isPlainObject from 'lodash-es/isPlainObject';
 import isEmpty  from 'lodash-es/isEmpty';
 import { VirtualNode } from './virtual-node';
 import version from '../version';
-import { isHook } from '../conditions';
+import { isHook } from '../utilities/conditions';
 import getChildNodes from './get-child-nodes';
 
 var eventStore = [];
