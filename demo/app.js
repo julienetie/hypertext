@@ -133,15 +133,25 @@ const createVTree = (interfaceSelector) => {
     }
     return attr;
   }
-  getDefinedAttributes(element.attributes)
+  
+  function getChildrenAsArray(children){
+    const childrenArr = [];
+    const childrenLength = children.length;
+
+    for(let i = 0; i < childrenLength; i++){
+      childrenArr.push(createVTree(children[i]));
+    }
+    return childrenArr;
+  }
+
 
   // Add root node.
   vTree.tagName = element.tagName;
-  // vTree.properties = 
+  vTree.properties = getDefinedAttributes(element.attributes);
+  vTree.children = getChildrenAsArray(element.children);
+
+  return vTree;
 }
 
 
-
-
-var test = document.querySelector('.main-wrapper');
-createVTree(test);
+console.log(createVTree('.main-wrapper'));
