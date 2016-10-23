@@ -1,5 +1,5 @@
 import { assembly, loop, or } from './assembly';
-import create from './create';
+import createNodes from './create-nodes';
 import eventStore from './events/event-store';
 import arrayFrom from './polyfills/array-from';
 
@@ -107,7 +107,7 @@ window.video = assembly('video');
 
 
 // Create API
-window.createNodes = create;
+window.createNodes = createNodes;
 window.loop = loop;
 window.or = or;
 window.eventStore = eventStore;

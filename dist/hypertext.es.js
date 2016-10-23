@@ -1026,24 +1026,6 @@ function or(data, inner, supportData) {
 	return internal$1.apply(this, [data, inner, supportData]);
 }
 
-/**
- * Pass a condition once with a given reference.
- * @param {string} reference - A unique reference per conditon.
- * @return {Boolean}
- */
-function once(reference) {
-    if (!once.prototype.references) {
-        once.prototype.references = {};
-    }
-    // Store reference if dosen't exist.
-    if (!once.prototype.references.hasOwnProperty(reference)) {
-        once.prototype.references[reference] = null;
-        return true;
-    } else {
-        return false;
-    }
-}
-
 var eventStore$1 = {};
 
 /*
@@ -1062,95 +1044,33 @@ const storeEventTarget = (HTMLElement, eventReference) => {
 			eventStore$1.push(HTMLElement);
 		}
 	}
-	// if(once('console.log.eventStore' + eventReference)){
-	// 	HTMLElement.addEventListener('click',function(){
-	// 		console.log('test',HTMLElement)
-	// 	},false)		
-	// }
 };
 
-function create(virtualNode, opts) {
-    const doc = opts ? opts.document || document : document;
-    const warn = opts ? opts.warn : null;
-    let i;
-    let node;
-    let children;
-    let childNode;
-    let vnode = virtualNode;
-    let virtualNodeEvent = virtualNode.event;
+var removeProperty$1 = removeProperty = (node, propName, propValue, previous) => {
+    if (previous) {
+        const previousValue = previous[propName];
 
-    vnode = handleThunk(virtualNode).a;
-
-    if (isWidget(vnode)) {
-        return vnode.init();
-    } else if (isVirtualText(vnode)) {
-        return doc.createTextNode(vnode.text);
-    } else if (!isVirtualNode(vnode)) {
-        if (warn) {
-            warn("Item is not a valid virtual dom node", vnode);
-        }
-        return null;
-    }
-
-    if (vnode.namespace === null) {
-        node = doc.createElement(vnode.tagName);
-        if (virtualNodeEvent) {
-            storeEventTarget(node, virtualNodeEvent);
-        }
-    } else {
-        node = doc.createElementNS(vnode.namespace, vnode.tagName);
-    }
-
-    applyProperties(node, vnode.properties);
-
-    children = vnode.children;
-
-    for (i = 0; i < children.length; i++) {
-        childNode = create(children[i], opts);
-        if (childNode) {
-            node.appendChild(childNode);
-        }
-    }
-
-    return node;
-}
-
-const handleThunk = (a, b) => {
-    return {
-        a: isThunk(a) ? renderThunk(a, null) : a,
-        b: isThunk(b) ? renderThunk(b, a) : b
-    };
-};
-
-const applyProperties = (node, props, previous) => {
-    let propName;
-    let propValue;
-    let isPropHook;
-
-    for (propName in props) {
-        propValue = props[propName];
-        isPropHook = isHook(propValue);
-
-        if (propValue === undefined || isPropHook) {
-            removeProperty(node, propName, propValue, previous);
-        }
-
-        if (isPropHook) {
-            if (propValue.hook) {
-                propValue.hook(node, propName, previous ? previous[propName] : undefined);
-            }
-        } else {
-            if (isPlainObject(propValue)) {
-                patchObject(node, props, previous, propName, propValue);
+        if (!isHook(previousValue)) {
+            if (propName === "attributes") {
+                for (var attrName in previousValue) {
+                    node.removeAttribute(attrName);
+                }
+            } else if (propName === "style") {
+                for (var i in previousValue) {
+                    node.style[i] = "";
+                }
+            } else if (typeof previousValue === "string") {
+                node[propName] = "";
             } else {
-                propName = propName === 'class' ? 'className' : propName;
-                node[propName] = propValue;
+                node[propName] = null;
             }
+        } else if (previousValue.unhook) {
+            previousValue.unhook(node, propName, propValue);
         }
     }
 };
 
-const patchObject = (node, props, previous, propName, propValue) => {
+var patchObject$1 = patchObject = (node, props, previous, propName, propValue) => {
     let previousValue = previous ? previous[propName] : undefined;
     let attrValue;
     let attrName;
@@ -1186,29 +1106,164 @@ const patchObject = (node, props, previous, propName, propValue) => {
     }
 };
 
-const removeProperty = (node, propName, propValue, previous) => {
-    if (previous) {
-        const previousValue = previous[propName];
+var applyProperties$1 = applyProperties = (node, props, previous) => {
+    let propName;
+    let propValue;
+    let isPropHook;
 
-        if (!isHook(previousValue)) {
-            if (propName === "attributes") {
-                for (var attrName in previousValue) {
-                    node.removeAttribute(attrName);
-                }
-            } else if (propName === "style") {
-                for (var i in previousValue) {
-                    node.style[i] = "";
-                }
-            } else if (typeof previousValue === "string") {
-                node[propName] = "";
-            } else {
-                node[propName] = null;
+    for (propName in props) {
+        propValue = props[propName];
+        isPropHook = isHook(propValue);
+
+        if (propValue === undefined || isPropHook) {
+            removeProperty$1(node, propName, propValue, previous);
+        }
+
+        if (isPropHook) {
+            if (propValue.hook) {
+                propValue.hook(node, propName, previous ? previous[propName] : undefined);
             }
-        } else if (previousValue.unhook) {
-            previousValue.unhook(node, propName, propValue);
+        } else {
+            if (isPlainObject(propValue)) {
+                patchObject$1(node, props, previous, propName, propValue);
+            } else {
+                propName = propName === 'class' ? 'className' : propName;
+                node[propName] = propValue;
+            }
         }
     }
 };
+
+function createNodes$1(virtualNode, opts) {
+    const doc = opts ? opts.document || document : document;
+    const warn = opts ? opts.warn : null;
+    let i;
+    let node;
+    let children;
+    let childNode;
+    let vnode = virtualNode;
+    let virtualNodeEvent = virtualNode.event;
+
+    if (isWidget(vnode)) {
+        return vnode.init();
+    } else if (isVirtualText(vnode)) {
+        return doc.createTextNode(vnode.text);
+    } else if (!isVirtualNode(vnode)) {
+        if (warn) {
+            warn("Item is not a valid virtual dom node", vnode);
+        }
+        return null;
+    }
+
+    if (vnode.namespace === null) {
+        node = doc.createElement(vnode.tagName);
+        if (virtualNodeEvent) {
+            storeEventTarget(node, virtualNodeEvent);
+        }
+    } else {
+        node = doc.createElementNS(vnode.namespace, vnode.tagName);
+    }
+
+    applyProperties$1(node, vnode.properties);
+
+    children = vnode.children;
+
+    for (i = 0; i < children.length; i++) {
+        childNode = createNodes$1(children[i], opts);
+        if (childNode) {
+            node.appendChild(childNode);
+        }
+    }
+
+    return node;
+}
+
+var arrayFrom = function () {
+  // Production steps of ECMA-262, Edition 6, 22.1.2.1
+  // Reference: https://people.mozilla.org/~jorendorff/es6-draft.html#sec-array.from
+  if (!Array.from) {
+    Array.from = function () {
+      var toStr = Object.prototype.toString;
+      var isCallable = function (fn) {
+        return typeof fn === 'function' || toStr.call(fn) === '[object Function]';
+      };
+      var toInteger = function (value) {
+        var number = Number(value);
+        if (isNaN(number)) {
+          return 0;
+        }
+        if (number === 0 || !isFinite(number)) {
+          return number;
+        }
+        return (number > 0 ? 1 : -1) * Math.floor(Math.abs(number));
+      };
+      var maxSafeInteger = Math.pow(2, 53) - 1;
+      var toLength = function (value) {
+        var len = toInteger(value);
+        return Math.min(Math.max(len, 0), maxSafeInteger);
+      };
+
+      // The length property of the from method is 1.
+      return function from(arrayLike /*, mapFn, thisArg */) {
+        // 1. Let C be the this value.
+        var C = this;
+
+        // 2. Let items be ToObject(arrayLike).
+        var items = Object(arrayLike);
+
+        // 3. ReturnIfAbrupt(items).
+        if (arrayLike == null) {
+          throw new TypeError("Array.from requires an array-like object - not null or undefined");
+        }
+
+        // 4. If mapfn is undefined, then let mapping be false.
+        var mapFn = arguments.length > 1 ? arguments[1] : void undefined;
+        var T;
+        if (typeof mapFn !== 'undefined') {
+          // 5. else
+          // 5. a If IsCallable(mapfn) is false, throw a TypeError exception.
+          if (!isCallable(mapFn)) {
+            throw new TypeError('Array.from: when provided, the second argument must be a function');
+          }
+
+          // 5. b. If thisArg was supplied, let T be thisArg; else let T be undefined.
+          if (arguments.length > 2) {
+            T = arguments[2];
+          }
+        }
+
+        // 10. Let lenValue be Get(items, "length").
+        // 11. Let len be ToLength(lenValue).
+        var len = toLength(items.length);
+
+        // 13. If IsConstructor(C) is true, then
+        // 13. a. Let A be the result of calling the [[Construct]] internal method of C with an argument list containing the single item len.
+        // 14. a. Else, Let A be ArrayCreate(len).
+        var A = isCallable(C) ? Object(new C(len)) : new Array(len);
+
+        // 16. Let k be 0.
+        var k = 0;
+        // 17. Repeat, while k < len… (also steps a - h)
+        var kValue;
+        while (k < len) {
+          kValue = items[k];
+          if (mapFn) {
+            A[k] = typeof T === 'undefined' ? mapFn(kValue, k) : mapFn.call(T, kValue, k);
+          } else {
+            A[k] = kValue;
+          }
+          k += 1;
+        }
+        // 18. Let putStatus be Put(A, "length", len, true).
+        A.length = len;
+        // 20. Return A.
+        return A;
+      };
+    }();
+  }
+};
+
+arrayFrom();
 
 const a = assembly('a');
 const abbr = assembly('abbr');
@@ -1310,7 +1365,4 @@ const ul = assembly('ul');
 const v = assembly('var');
 const video = assembly('video');
 
-// Create API
-const createNodes = create;
-
-export { a, abbr, address, area, article, aside, audio, b, base, bdi, bdo, blockquote, body, br, button, canvas, caption, cite, code, col, colgroup, command, dd, del, dfn, div, dl, doctype, dt, em, embed, fieldset, figcaption, figure, footer, form, h1, h2, h3, h4, h5, h6, header, hgroup, hr, html, i, iframe, img, input, ins, kbd, keygen, label, legend, li, link, map, mark, menu, meta, nav, noscript, object, ol, optgroup, option, p, param, pre, progress, q, rp, rt, ruby, s, samp, script, section, select, small, source, span, strong, style, sub, sup, table, tbody, td, textarea, tfoot, th, thead, title, tr, ul, v, video, assembly, loop, or, createNodes, eventStore$1 as eventStore };
+export { a, abbr, address, area, article, aside, audio, b, base, bdi, bdo, blockquote, body, br, button, canvas, caption, cite, code, col, colgroup, command, dd, del, dfn, div, dl, doctype, dt, em, embed, fieldset, figcaption, figure, footer, form, h1, h2, h3, h4, h5, h6, header, hgroup, hr, html, i, iframe, img, input, ins, kbd, keygen, label, legend, li, link, map, mark, menu, meta, nav, noscript, object, ol, optgroup, option, p, param, pre, progress, q, rp, rt, ruby, s, samp, script, section, select, small, source, span, strong, style, sub, sup, table, tbody, td, textarea, tfoot, th, thead, title, tr, ul, v, video, assembly, loop, or, createNodes$1 as createNodes, eventStore$1 as eventStore };

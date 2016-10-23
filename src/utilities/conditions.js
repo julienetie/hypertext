@@ -1,6 +1,5 @@
-import version from './version';
-import isArray from '../node_modules/lodash-es/isArray';
-
+import version from '../version';
+import isArray from 'lodash-es/isArray';
 
 const isVirtualText = (virtualText) => {
 	return virtualText && virtualText.type === "VirtualText" && virtualText.version === version;

@@ -1036,24 +1036,6 @@ function or(data, inner, supportData) {
 	return internal$1.apply(this, [data, inner, supportData]);
 }
 
-/**
- * Pass a condition once with a given reference.
- * @param {string} reference - A unique reference per conditon.
- * @return {Boolean}
- */
-function once(reference) {
-    if (!once.prototype.references) {
-        once.prototype.references = {};
-    }
-    // Store reference if dosen't exist.
-    if (!once.prototype.references.hasOwnProperty(reference)) {
-        once.prototype.references[reference] = null;
-        return true;
-    } else {
-        return false;
-    }
-}
-
 var eventStore$1 = {};
 
 /*
@@ -1072,90 +1054,28 @@ var storeEventTarget = function storeEventTarget(HTMLElement, eventReference) {
 			eventStore$1.push(HTMLElement);
 		}
 	}
-	// if(once('console.log.eventStore' + eventReference)){
-	// 	HTMLElement.addEventListener('click',function(){
-	// 		console.log('test',HTMLElement)
-	// 	},false)		
-	// }
 };
 
-function create(virtualNode, opts) {
-    var doc = opts ? opts.document || document : document;
-    var warn = opts ? opts.warn : null;
-    var i = void 0;
-    var node = void 0;
-    var children = void 0;
-    var childNode = void 0;
-    var vnode = virtualNode;
-    var virtualNodeEvent = virtualNode.event;
+var removeProperty = function removeProperty(node, propName, propValue, previous) {
+    if (previous) {
+        var previousValue = previous[propName];
 
-    vnode = handleThunk(virtualNode).a;
-
-    if (isWidget(vnode)) {
-        return vnode.init();
-    } else if (isVirtualText(vnode)) {
-        return doc.createTextNode(vnode.text);
-    } else if (!isVirtualNode(vnode)) {
-        if (warn) {
-            warn("Item is not a valid virtual dom node", vnode);
-        }
-        return null;
-    }
-
-    if (vnode.namespace === null) {
-        node = doc.createElement(vnode.tagName);
-        if (virtualNodeEvent) {
-            storeEventTarget(node, virtualNodeEvent);
-        }
-    } else {
-        node = doc.createElementNS(vnode.namespace, vnode.tagName);
-    }
-
-    applyProperties(node, vnode.properties);
-
-    children = vnode.children;
-
-    for (i = 0; i < children.length; i++) {
-        childNode = create(children[i], opts);
-        if (childNode) {
-            node.appendChild(childNode);
-        }
-    }
-
-    return node;
-}
-
-var handleThunk = function handleThunk(a, b) {
-    return {
-        a: isThunk(a) ? renderThunk(a, null) : a,
-        b: isThunk(b) ? renderThunk(b, a) : b
-    };
-};
-
-var applyProperties = function applyProperties(node, props, previous) {
-    var propName = void 0;
-    var propValue = void 0;
-    var isPropHook = void 0;
-
-    for (propName in props) {
-        propValue = props[propName];
-        isPropHook = isHook(propValue);
-
-        if (propValue === undefined || isPropHook) {
-            removeProperty(node, propName, propValue, previous);
-        }
-
-        if (isPropHook) {
-            if (propValue.hook) {
-                propValue.hook(node, propName, previous ? previous[propName] : undefined);
-            }
-        } else {
-            if (isPlainObject(propValue)) {
-                patchObject(node, props, previous, propName, propValue);
+        if (!isHook(previousValue)) {
+            if (propName === "attributes") {
+                for (var attrName in previousValue) {
+                    node.removeAttribute(attrName);
+                }
+            } else if (propName === "style") {
+                for (var i in previousValue) {
+                    node.style[i] = "";
+                }
+            } else if (typeof previousValue === "string") {
+                node[propName] = "";
             } else {
-                propName = propName === 'class' ? 'className' : propName;
-                node[propName] = propValue;
+                node[propName] = null;
             }
+        } else if (previousValue.unhook) {
+            previousValue.unhook(node, propName, propValue);
         }
     }
 };
@@ -1196,29 +1116,77 @@ var patchObject = function patchObject(node, props, previous, propName, propValu
     }
 };
 
-var removeProperty = function removeProperty(node, propName, propValue, previous) {
-    if (previous) {
-        var previousValue = previous[propName];
+var applyProperties = function applyProperties(node, props, previous) {
+    var propName = void 0;
+    var propValue = void 0;
+    var isPropHook = void 0;
 
-        if (!isHook(previousValue)) {
-            if (propName === "attributes") {
-                for (var attrName in previousValue) {
-                    node.removeAttribute(attrName);
-                }
-            } else if (propName === "style") {
-                for (var i in previousValue) {
-                    node.style[i] = "";
-                }
-            } else if (typeof previousValue === "string") {
-                node[propName] = "";
-            } else {
-                node[propName] = null;
+    for (propName in props) {
+        propValue = props[propName];
+        isPropHook = isHook(propValue);
+
+        if (propValue === undefined || isPropHook) {
+            removeProperty(node, propName, propValue, previous);
+        }
+
+        if (isPropHook) {
+            if (propValue.hook) {
+                propValue.hook(node, propName, previous ? previous[propName] : undefined);
             }
-        } else if (previousValue.unhook) {
-            previousValue.unhook(node, propName, propValue);
+        } else {
+            if (isPlainObject(propValue)) {
+                patchObject(node, props, previous, propName, propValue);
+            } else {
+                propName = propName === 'class' ? 'className' : propName;
+                node[propName] = propValue;
+            }
         }
     }
 };
+
+function createNodes$1(virtualNode, opts) {
+    var doc = opts ? opts.document || document : document;
+    var warn = opts ? opts.warn : null;
+    var i = void 0;
+    var node = void 0;
+    var children = void 0;
+    var childNode = void 0;
+    var vnode = virtualNode;
+    var virtualNodeEvent = virtualNode.event;
+
+    if (isWidget(vnode)) {
+        return vnode.init();
+    } else if (isVirtualText(vnode)) {
+        return doc.createTextNode(vnode.text);
+    } else if (!isVirtualNode(vnode)) {
+        if (warn) {
+            warn("Item is not a valid virtual dom node", vnode);
+        }
+        return null;
+    }
+
+    if (vnode.namespace === null) {
+        node = doc.createElement(vnode.tagName);
+        if (virtualNodeEvent) {
+            storeEventTarget(node, virtualNodeEvent);
+        }
+    } else {
+        node = doc.createElementNS(vnode.namespace, vnode.tagName);
+    }
+
+    applyProperties(node, vnode.properties);
+
+    children = vnode.children;
+
+    for (i = 0; i < children.length; i++) {
+        childNode = createNodes$1(children[i], opts);
+        if (childNode) {
+            node.appendChild(childNode);
+        }
+    }
+
+    return node;
+}
 
 var arrayFrom = function () {
   // Production steps of ECMA-262, Edition 6, 22.1.2.1
@@ -1307,12 +1275,10 @@ var arrayFrom = function () {
 
 arrayFrom();
 
-var createNodes = create;
-
 exports.assembly = createVirtualNode;
 exports.loop = loop;
 exports.or = or;
-exports.createNodes = createNodes;
+exports.createNodes = createNodes$1;
 exports.eventStore = eventStore$1;
 
 Object.defineProperty(exports, '__esModule', { value: true });
