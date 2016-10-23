@@ -1070,77 +1070,58 @@ const removeProperty = (node, propName, propValue, previous) => {
     }
 };
 
-const patchObject = (node, props, previous, propName, propValue) => {
-    // let previousValue = previous ? previous[propName] : undefined;
-    let attrValue;
-    let attrName;
-    let stylePropName;
+function applyStyles(node, propName, propValue) {
+    let propertyName = propName;
     let value;
-
-    if (propName === "attributes") {
-
-        for (attrName in propValue) {
-            attrValue = propValue[attrName];
-
-            if (attrValue === undefined) {
-                node.removeAttribute(attrName);
-            } else {
-                node.setAttribute(attrName, attrValue);
-            }
-        }
-    } else {
-
-        if (!isPlainObject(node[propName])) node[propName] = {};
-
-        for (stylePropName in propValue) {
-            value = propValue[stylePropName];
-            node[propName][stylePropName] = !!value || value + '';
-        }
+    for (let stylePropName in propValue) {
+        value = propValue[stylePropName];
+        node[propName][stylePropName] = value || value + '';
     }
-};
+}
 
-const applyProperties = (node, props, previous) => {
-    let propName;
+function applyProperties(node, props) {
     let propValue;
-    let isPropHook;
+    for (let propName in props) {
 
-    for (propName in props) {
         propValue = props[propName];
-        isPropHook = isHook(propValue);
 
-        if (propValue === undefined || isPropHook) {
-            removeProperty(node, propName, propValue, previous);
-        }
-
-        if (isPropHook) {
+        if (propValue === undefined) {
+            removeProperty(node, propName, propValue);
+        } else if (isHook(propValue)) {
+            removeProperty(node, propName, propValue);
             if (propValue.hook) {
-                propValue.hook(node, propName, previous ? previous[propName] : undefined);
+                propValue.hook(node, propName);
             }
         } else {
+
             if (isPlainObject(propValue)) {
-                patchObject(node, props, previous, propName, propValue);
+                applyStyles(node, propName, propValue); // Property is a style.
             } else {
-                propName = propName === 'class' ? 'className' : propName;
+                // If property is a an attribute.
+                switch (propName) {
+                    case 'class':
+                        propName = 'className';
+                        break;
+                }
                 node[propName] = propValue;
             }
         }
     }
-};
+}
 
 function createNodes$1(virtualNode, opts) {
-    const doc = opts ? opts.document || document : document;
     const warn = opts ? opts.warn : null;
-    let i;
-    let node;
-    let children;
-    let childNode;
     let vnode = virtualNode;
     let virtualNodeEvent = virtualNode.event;
+    let children;
+    let childNode;
+    let node;
 
+    // If widget, Vtext or not a vnode
     if (isWidget(vnode)) {
         return vnode.init();
     } else if (isVirtualText(vnode)) {
-        return doc.createTextNode(vnode.text);
+        return document.createTextNode(vnode.text);
     } else if (!isVirtualNode(vnode)) {
         if (warn) {
             warn("Item is not a valid virtual dom node", vnode);
@@ -1148,20 +1129,22 @@ function createNodes$1(virtualNode, opts) {
         return null;
     }
 
+    // if no namespace create HTML, else create SVG
     if (vnode.namespace === null) {
-        node = doc.createElement(vnode.tagName);
+        node = document.createElement(vnode.tagName);
         if (virtualNodeEvent) {
             storeEventTarget(node, virtualNodeEvent);
         }
     } else {
-        node = doc.createElementNS(vnode.namespace, vnode.tagName);
+        node = document.createElementNS(vnode.namespace, vnode.tagName);
     }
 
     applyProperties(node, vnode.properties);
 
     children = vnode.children;
+    let childrenLength = children.length;
 
-    for (i = 0; i < children.length; i++) {
+    for (let i = 0; i < childrenLength; i++) {
         childNode = createNodes$1(children[i], opts);
         if (childNode) {
             node.appendChild(childNode);
