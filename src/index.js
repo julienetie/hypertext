@@ -1,7 +1,9 @@
 import { assembly, loop, or } from './assembly';
 import create from './create';
 import eventStore from './events/event-store';
+import arrayFrom from './polyfills/array-from';
 
+arrayFrom();
 
 export const a = assembly('a');
 export const abbr = assembly('abbr');
