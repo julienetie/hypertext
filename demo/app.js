@@ -153,7 +153,12 @@ const createVTree = (interfaceSelector, whitespaceRules = 'trim') => {
 
       for(let i = 0; i < childNodesLength; i++){
         if(childNodes[i].nodeType === 3 & ignoreTrim){
-
+          /*
+           *  "\t" TAB \u0009
+           *  "\n" LF  \u000A
+           *  "\r" CR  \u000D
+           *  " "  SPC \u0020
+          */
           if(childNodes[i].nodeValue === childNodes[i].nodeValue.replace(/^\s+|\s+$/g, '')){
              childNodesArr.push(createVTree(childNodes[i],whitespaceRules));
           }
@@ -166,22 +171,35 @@ const createVTree = (interfaceSelector, whitespaceRules = 'trim') => {
   }
 
 
-  // Set tag name.
-  vTree.tagName = element.tagName || element.nodeName.substring(1).toUpperCase();
+
+  if(element.nodeType === 3){
+  // Text.
+    vTree.text = element.nodeValue;
+  }else{
+  // Tag name.
+    vTree.tagName = element.tagName;
+  }
 
   if(element.attributes){
+  // Properties.
     vTree.properties = getDefinedAttributes(element.attributes); 
   }
+
   if(element.childNodes.length){
+  // Children.
     vTree.children = getChildNodesAsArray(element.childNodes); 
   }
 
+  // TODO
+  // "namespace": null,
+  // "count": 1,
+  // "hasWidgets": false,
+  // "hasThunks": false,
+  // "descendantHooks": false,
+  // "event": false,
+  // "virtualNode": true
+
   return vTree;
 }
-/*
- *  "\t" TAB \u0009
- *  "\n" LF  \u000A
- *  "\r" CR  \u000D
- *  " "  SPC \u0020
-*/
+
 console.log(createVTree('.main-wrapper'));
