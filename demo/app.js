@@ -113,7 +113,8 @@
 // console.log(tree)
 
 
-const createVTree = (interfaceSelector) => {
+const createVTree = (interfaceSelector, whitespaceRules = 'trim') => {
+
   var element;
   var vTree = {};
   if(interfaceSelector.nodeType){
@@ -134,24 +135,53 @@ const createVTree = (interfaceSelector) => {
     return attr;
   }
   
-  function getChildrenAsArray(children){
-    const childrenArr = [];
-    const childrenLength = children.length;
+  // function getChildrenAsArray(children){
+  //   const childrenArr = [];
+  //   const childrenLength = children.length;
 
-    for(let i = 0; i < childrenLength; i++){
-      childrenArr.push(createVTree(children[i]));
-    }
-    return childrenArr;
+  //   for(let i = 0; i < childrenLength; i++){
+  //     childrenArr.push(createVTree(children[i]));
+  //   }
+  //   return childrenArr;
+  // }
+
+
+  function getChildNodesAsArray(childNodes){
+    const ignoreTrim = !(whitespaceRules === 'ignore-trim');
+    const childNodesArr = [];
+    let childNodesLength = childNodes.length;
+
+      for(let i = 0; i < childNodesLength; i++){
+        if(childNodes[i].nodeType === 3 & ignoreTrim){
+
+          if(childNodes[i].nodeValue === childNodes[i].nodeValue.replace(/^\s+|\s+$/g, '')){
+             childNodesArr.push(createVTree(childNodes[i],whitespaceRules));
+          }
+        }else{
+          childNodesArr.push(createVTree(childNodes[i],whitespaceRules));
+        }
+      }
+
+    return childNodesArr;
   }
 
 
-  // Add root node.
-  vTree.tagName = element.tagName;
-  vTree.properties = getDefinedAttributes(element.attributes);
-  vTree.children = getChildrenAsArray(element.children);
+  // Set tag name.
+  vTree.tagName = element.tagName || element.nodeName.substring(1).toUpperCase();
+
+  if(element.attributes){
+    vTree.properties = getDefinedAttributes(element.attributes); 
+  }
+  if(element.childNodes.length){
+    vTree.children = getChildNodesAsArray(element.childNodes); 
+  }
 
   return vTree;
 }
-
-
+/*
+ *  "\t" TAB \u0009
+ *  "\n" LF  \u000A
+ *  "\r" CR  \u000D
+ *  " "  SPC \u0020
+*/
 console.log(createVTree('.main-wrapper'));
