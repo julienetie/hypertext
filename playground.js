@@ -63,7 +63,7 @@ var input = assembly('INPUT');
 
 		var helloWorld =
 		    createNodes(
-		        div({ class: 'hello', id: 'world', event: 'outer-div'},
+		        div({ class: 'hello', id: 'world', event: 'outer-div', style:{background: 'pink', color: 'red', margin: 0, padding: '3rem'}},
 		            h1('Hello World!'),
 		            input({value: 235235, placeholder: 'This is a placeholder'}),
 		            p({ event: 'paragraph'},'This is Hypertext'),

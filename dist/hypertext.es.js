@@ -1046,7 +1046,7 @@ const storeEventTarget = (HTMLElement, eventReference) => {
 	}
 };
 
-var removeProperty$1 = removeProperty = (node, propName, propValue, previous) => {
+const removeProperty = (node, propName, propValue, previous) => {
     if (previous) {
         const previousValue = previous[propName];
 
@@ -1070,15 +1070,13 @@ var removeProperty$1 = removeProperty = (node, propName, propValue, previous) =>
     }
 };
 
-var patchObject$1 = patchObject = (node, props, previous, propName, propValue) => {
-    let previousValue = previous ? previous[propName] : undefined;
+const patchObject = (node, props, previous, propName, propValue) => {
+    // let previousValue = previous ? previous[propName] : undefined;
     let attrValue;
     let attrName;
-    let replacer;
-    let k;
+    let stylePropName;
     let value;
 
-    // Set attributes
     if (propName === "attributes") {
 
         for (attrName in propValue) {
@@ -1090,23 +1088,18 @@ var patchObject$1 = patchObject = (node, props, previous, propName, propValue) =
                 node.setAttribute(attrName, attrValue);
             }
         }
+    } else {
 
-        return;
-    }
+        if (!isPlainObject(node[propName])) node[propName] = {};
 
-    if (!isPlainObject(node[propName])) {
-        node[propName] = {};
-    }
-
-    replacer = propName === "style" ? "" : undefined;
-
-    for (k in propValue) {
-        value = propValue[k];
-        node[propName][k] = value === undefined ? replacer : value;
+        for (stylePropName in propValue) {
+            value = propValue[stylePropName];
+            node[propName][stylePropName] = !!value || value + '';
+        }
     }
 };
 
-var applyProperties$1 = applyProperties = (node, props, previous) => {
+const applyProperties = (node, props, previous) => {
     let propName;
     let propValue;
     let isPropHook;
@@ -1116,7 +1109,7 @@ var applyProperties$1 = applyProperties = (node, props, previous) => {
         isPropHook = isHook(propValue);
 
         if (propValue === undefined || isPropHook) {
-            removeProperty$1(node, propName, propValue, previous);
+            removeProperty(node, propName, propValue, previous);
         }
 
         if (isPropHook) {
@@ -1125,7 +1118,7 @@ var applyProperties$1 = applyProperties = (node, props, previous) => {
             }
         } else {
             if (isPlainObject(propValue)) {
-                patchObject$1(node, props, previous, propName, propValue);
+                patchObject(node, props, previous, propName, propValue);
             } else {
                 propName = propName === 'class' ? 'className' : propName;
                 node[propName] = propValue;
@@ -1164,7 +1157,7 @@ function createNodes$1(virtualNode, opts) {
         node = doc.createElementNS(vnode.namespace, vnode.tagName);
     }
 
-    applyProperties$1(node, vnode.properties);
+    applyProperties(node, vnode.properties);
 
     children = vnode.children;
 

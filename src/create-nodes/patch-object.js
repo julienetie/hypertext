@@ -1,39 +1,8 @@
-import isPlainObject from 'lodash-es/isPlainObject';
-
-const patchObject = (node, props, previous, propName, propValue) => {
-    let previousValue = previous ? previous[propName] : undefined;
-    let attrValue;
-    let attrName;
-    let replacer;
-    let k;
+export default function patchObject(node, propName, propValue) {
+    let propertyName = propName;
     let value;
-
-    // Set attributes
-    if (propName === "attributes") {
-
-        for (attrName in propValue) {
-            attrValue = propValue[attrName]
-
-            if (attrValue === undefined) {
-                node.removeAttribute(attrName)
-            } else {
-                node.setAttribute(attrName, attrValue)
-            }
+        for (let stylePropName in propValue) {
+            value = propValue[stylePropName];
+            node[propName][stylePropName] = value || value + '';
         }
-
-        return;
-    }
-
-    if (!isPlainObject(node[propName])) {
-        node[propName] = {};
-    }
-
-    replacer = propName === "style" ? "" : undefined
-
-    for (k in propValue) {
-        value = propValue[k];
-        node[propName][k] = (value === undefined) ? replacer : value;
-    }
 }
-
-export default patchObject;

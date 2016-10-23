@@ -3,32 +3,30 @@ import removeProperty from './remove-property';
 import isPlainObject from 'lodash-es/isPlainObject';
 import patchObject from './patch-object';
 
-const applyProperties = (node, props, previous) => {
-    let propName;
+function applyProperties(node, props) {
     let propValue;
-    let isPropHook;
+    for (let propName in props) {
 
-    for (propName in props) {
-        propValue = props[propName];
-        isPropHook = isHook(propValue);
+        propValue = props[propName]
 
-        if (propValue === undefined || isPropHook) {
-            removeProperty(node, propName, propValue, previous);
-        } 
-
-        if (isPropHook) {
+        if (propValue === undefined) {
+            removeProperty(node, propName, propValue);
+        } else if (isHook(propValue)) {
+            removeProperty(node, propName, propValue)
             if (propValue.hook) {
-                propValue.hook(
-                    node,
-                    propName,
-                    previous ? previous[propName] : undefined
-                    );
+                propValue.hook(node,propName)
             }
         } else {
-            if (isPlainObject(propValue)) {
-                patchObject(node, props, previous, propName, propValue);
-            } else {
-                propName = propName === 'class' ? 'className' : propName;
+        
+            if(isPlainObject(propValue)){
+                patchObject(node, propName, propValue); // Property is a style.
+            }else{
+                // If property is a an attribute.
+                switch(propName){
+                    case 'class':
+                    propName = 'className';
+                    break;
+                }
                 node[propName] = propValue;
             }
         }
