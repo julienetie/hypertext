@@ -1,7 +1,7 @@
 import {isHook, isVirtualNode, isWidget } from '../utilities/conditions';
 import removeProperty from './remove-property';
 import isPlainObject from 'lodash-es/isPlainObject';
-import patchObject from './patch-object';
+import applyStyles from './apply-styles';
 
 function applyProperties(node, props) {
     let propValue;
@@ -19,7 +19,7 @@ function applyProperties(node, props) {
         } else {
         
             if(isPlainObject(propValue)){
-                patchObject(node, propName, propValue); // Property is a style.
+                applyStyles(node, propName, propValue); // Property is a style.
             }else{
                 // If property is a an attribute.
                 switch(propName){

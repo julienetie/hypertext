@@ -1,4 +1,4 @@
-export default function patchObject(node, propName, propValue) {
+export default function applyStyles(node, propName, propValue) {
     let propertyName = propName;
     let value;
         for (let stylePropName in propValue) {
