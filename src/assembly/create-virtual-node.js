@@ -1,5 +1,5 @@
 import isPlainObject from 'lodash-es/isPlainObject';
-import isEmpty  from 'lodash-es/isEmpty';
+import isEmpty from 'lodash-es/isEmpty';
 import { VirtualNode } from './virtual-node';
 import version from '../version';
 import { isHook } from '../utilities/conditions';
@@ -8,7 +8,7 @@ import getChildNodes from './get-child-nodes';
 var eventStore = [];
 
 export default (tagName) => {
-
+    const tagNameUppercase = tagName.toUpperCase();
     return function(...args) {
         let childNodes = [];
         let children = [];
@@ -27,22 +27,22 @@ export default (tagName) => {
             if (typeof item === 'string' || typeof item === 'number') {
                 children.push(item);
 
-            // Check if item is a child.
+                // Check if item is a child.
             } else if (item !== null && item.hasOwnProperty('virtualNode')) {
                 children.push(item);
 
-            // Check if item is a properties object.
+                // Check if item is a properties object.
             } else if (isPlainObject(item)) {
 
                 // Check if it has the event property.
-                if(item.hasOwnProperty('event')){
+                if (item.hasOwnProperty('event')) {
                     event = item.event;
                     delete item.event;
                 }
 
                 // Check if properties is not empty.
-                if(!isEmpty(item)){
-                    props = item;      
+                if (!isEmpty(item)) {
+                    props = item;
                 }
 
             }
@@ -72,6 +72,13 @@ export default (tagName) => {
 
         allChildNodes = getChildNodes(children, childNodes);
 
-        return new VirtualNode(tagName, props, allChildNodes, key, namespace, event);
+        return new VirtualNode(
+            tagNameUppercase,
+            props,
+            allChildNodes,
+            key,
+            namespace,
+            event
+        );
     };
 }

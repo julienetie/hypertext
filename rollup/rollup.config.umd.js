@@ -4,11 +4,11 @@ import nodeResolve from 'rollup-plugin-node-resolve';
 
 export default {
     moduleName: 'hypertext',
-    entry: 'src/exports.js',
+    entry: './src/exports.js',
     plugins: [
         babel({
             babelrc: false,
-            exclude: 'node_modules/**',
+            exclude: './node_modules/**',
             presets: 'es2015-rollup'
         }),
         nodeResolve({
@@ -17,5 +17,5 @@ export default {
         })
     ],
     format: 'umd',
-    dest: 'dist/hypertext.js'
+    dest: './dist/hypertext.js'
 };

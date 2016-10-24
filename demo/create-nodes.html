@@ -1,0 +1,148 @@
+<!-- Hypertext createNodes example -->
+
+<!-- Original HTML and CSS by Dan Andersson http://codepen.io/praktikdan/ -->
+
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>Hypertext - createNodes</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+<link href="https://fonts.googleapis.com/css?family=Oxygen:300,400,700" rel="stylesheet">
+<link rel="stylesheet" href="./dist/style.css">
+</head>
+<body>
+
+
+<!-- Hypertext script -->
+<script src="./dist/hypertext-not-for-production.min.js"></script>
+<!-- some-app-template.js -->
+<script>
+var hypertext = 
+div({class:'main-wrapper'},
+  div({class:'hero-image'},
+    div({class:'hero-content'},
+      div({class:'hc-label'},'The Italian Dolomites'),
+      div({class:'hc-desc'},'Interview with Andy Free about his trip to the dolomites in Italy'),
+      div({class:'hc-footer'},
+        div({class:'hcf-comments'},span({class:'amount'},'168'),'Comments'),
+        div({class:'hcf-divider'}),
+        div({class:'hcf-shares'},span({class:'amount'},'26.842'),'Shares'),
+        div({class:'hcf-toggle'},
+          p({class:'hcft-label'},'More Articles'),
+          div({class:'hcft-icon-holder'},
+            i({class:'hcft-icon closed fa fa-chevron-down'}),
+            i({class:'hcft-icon opened fa fa-times'})
+          )
+        )
+      )
+    )
+  ),
+ 
+  div({class:'scroll-content'},
+    div({class:'sc-row'},
+      div({class:'content-article'},
+        div({class:'article-number'},'01'),
+        div({class:'article-info'},
+          div({class:'ai-label'},'Visiting Vester Peak'),
+          div({class:'ai-desc'},'Everything you should know about hiking in the mountains'),
+          div({class:'ai-footer'},
+            div({class:'aif-comments'},span({class:'amount'},'24'),'Comments'),
+            div({class:'aif-divider'}),
+            div({class:'aif-shares'},span({class:'amount'},'128'),'Shares')
+          )
+        ),
+        div({class:'article-image ca-1'})
+      ),
+      div({class:'content-article'},
+        div({class:'article-number'},'02'),
+        div({class:'article-info'},
+          div({class:'ai-label'},'Trailing Together'),
+          div({class:'ai-desc'},'Walking among the nature in the Rocky Mountain National Park, Colorado'),
+          div({class:'ai-footer'},
+            div({class:'aif-comments'},span({class:'amount'},'458'),'Comments'),
+            div({class:'aif-divider'}),
+            div({class:'aif-shares'},span({class:'amount'},'110'),'Shares')
+          )
+        ),
+        div({class:'article-image ca-2'})
+      )
+    ),
+    div({class:'sc-row'},
+      div({class:'content-article'},
+        div({class:'article-number'},'03'),
+        div({class:'article-info'},
+          div({class:'ai-label'},'The Magic Pond'),
+          div({class:'ai-desc'},'The scenery is set like a Monet painting'),
+          div({class:'ai-footer'},
+            div({class:'aif-comments'},span({class:'amount'},1640),'Comments'),
+            div({class:'aif-divider'}),
+            div({class:'aif-shares'},span({class:'amount'},86.451),'Shares')
+          )
+        ),
+        div({class:'article-image ca-3'})
+      ),
+      div({class:'content-article'},
+        div({class:'article-number'},'04'),
+        div({class:'article-info'},
+          div({class:'ai-label'},'Beach Essentials'),
+          div({class:'ai-desc'},'What should you bring to the beach, and what beaches should you visit?'),
+          div({class:'ai-footer'},
+            div({class:'aif-comments'},span({class:'amount'},58),'Comments'),
+            div({class:'aif-divider'}),
+            div({class:'aif-shares'},span({class:'amount'},1.359),'Shares')
+          )
+        ),
+        div({class:'article-image ca-4'})
+      )
+    ),
+    div({class:'sc-row'},
+      div({class:'content-article'},
+        div({class:'article-number'},'05'),
+        div({class:'article-info'},
+          div({class:'ai-label'},'Romantic Camping'),
+          div({class:'ai-desc'},'We went to Norway to find out just how romantic it can be sleeping under the stars'),
+          div({class:'ai-footer'},
+            div({class:'aif-comments'},span({class:'amount'},14),'Comments'),
+            div({class:'aif-divider'}),
+            div({class:'aif-shares'},span({class:'amount'},36),'Shares')
+          )
+        ),
+        div({class:'article-image ca-5'})
+      ),
+      div({class:'content-article'},
+        div({class:'article-number'},'06'),
+        div({class:'article-info'},
+          div({class:'ai-label'},'Cave Explorers'),
+          div({class:'ai-desc'},'In USA there\'s over a thousand caves. We list everyone that you should visit.'),
+          div({class:'ai-footer'},
+            div({class:'aif-comments'},span({class:'amount'},3590),'Comments'),
+            div({class:'aif-divider'}),
+            div({class:'aif-shares'},span({class:'amount'},129.547),'Shares')
+          )
+        ),
+        div({class:'article-image ca-6'})
+      )
+    )
+  )
+)
+
+// The virtual tree representation.
+console.info(hypertext)
+
+// Create DOM nodes from hypertext.
+var DOMNodes = createNodes(hypertext);
+
+// Append DOM nodes to the body.
+document.body.appendChild(DOMNodes);
+</script>
+
+
+
+<!-- some-app-event-bindings.js -->
+<script>
+	var htfcIcon = document.querySelector('.hcft-icon-holder');
+	var heroImage = document.querySelector('.hero-image');
+
+		htfcIcon.addEventListener('click', function(){
+			heroImage.classList.toggle('browsing-content');
+		});
+</script>
+</body>
+</html>

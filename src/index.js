@@ -1,5 +1,6 @@
 import { assembly, loop, or } from './assembly';
 import createNodes from './create-nodes';
+import createVirtualNodes from './create-virtual-nodes';
 import eventStore from './events/event-store';
 import arrayFrom from './polyfills/array-from';
 
@@ -105,4 +106,4 @@ export const ul = assembly('ul');
 export const v = assembly('var');
 export const video = assembly('video');
 
-export { assembly, loop, or, createNodes, eventStore }
+export { assembly, loop, or, createNodes, createVirtualNodes, eventStore };
