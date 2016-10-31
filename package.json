@@ -12,7 +12,8 @@
     "watch-g": "rollup -c ./rollup/rollup.config.not-for-production.js --watch",
     "umd-watch": "rollup -c ./rollup/rollup.config.umd.js --watch",
     "play": "./node_modules/.bin/wzrd  playground.js | ./node_modules/.bin/wtch | ./node_modules/.bin/garnish",
-    "demo": "./node_modules/.bin/http-server ./demo"
+    "demo": "./node_modules/.bin/http-server ./demo",
+    "test": "mocha --compilers js:babel-register --recursive"
   },
   "repository": {
     "type": "git",
@@ -54,7 +55,11 @@
     "rollup-watch": "^2.5.0",
     "virtual-dom": "^2.1.1",
     "wtch": "^4.0.1",
-    "wzrd": "^1.4.0"
+    "wzrd": "^1.4.0",
+    "babel-register": "*",
+    "chai": "^3.5.0",
+    "jsdom": "*",
+    "mocha": "*"
   },
   "dependencies": {
     "lodash-es": "^4.16.4"
