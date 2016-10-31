@@ -1,4 +1,4 @@
-import isArray from 'lodash-es/isArray';
+import isArray from '../../libs/isArray';
 import { isChild } from '../utilities/conditions';
 import { VirtualText } from './virtual-node';
 

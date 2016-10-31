@@ -1,8 +1,8 @@
-import isPlainObject from 'lodash-es/isPlainObject';
-import isEmpty from 'lodash-es/isEmpty';
+import isPlainObject from '../../libs/isPlainObject';
+import isEmpty from '../../libs/isEmpty';
 import { VirtualNode } from './virtual-node';
 import version from '../version';
-import { isHook } from '../utilities/conditions';
+import { isHook } from '../utilities/conditions'
 import getChildNodes from './get-child-nodes';
 
 var eventStore = [];

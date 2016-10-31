@@ -1,4 +1,4 @@
-import isArray from 'lodash-es/isArray';
+import isArray from '../../libs/isArray';
 
 function internal(data, callback, supportData) {
 	let childContainer = callback.apply(this, [data, supportData]);

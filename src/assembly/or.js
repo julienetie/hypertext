@@ -1,4 +1,4 @@
-import isArray from 'lodash-es/isArray';
+import isArray from '../../libs/isArray';
 import { isChild } from '../utilities/conditions';
 
 function internal(data, callback, supportData) {
