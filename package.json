@@ -1,6 +1,6 @@
 {
   "name": "hypertext",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Create HTML in JavaScript via virtual-dom VTrees or directly to the DOM: virtual-hyperscript alternative",
   "main": "dist/hypertext.js",
   "jsnext:main": "dist/hypertext.es.js",
