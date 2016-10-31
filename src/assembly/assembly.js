@@ -1,4 +1,5 @@
 import isPlainObject from '../../libs/isPlainObject';
+import isArray from '../../libs/isArray';
 import isEmpty from '../../libs/isEmpty';
 import { VirtualNode } from './virtual-node';
 import version from '../version';
@@ -7,7 +8,7 @@ import getChildNodes from './get-child-nodes';
 
 var eventStore = [];
 
-export default (tagName) => {
+const assembly = (tagName) => {
     const tagNameUppercase = tagName.toUpperCase();
     return function(...args) {
         let childNodes = [];
@@ -48,7 +49,7 @@ export default (tagName) => {
             }
 
             // Check if Loop of children 
-            if (item instanceof Array) {
+            if (isArray(item)) {
                 item.forEach(function(child) {
                     children.push(child);
                 });
@@ -82,3 +83,5 @@ export default (tagName) => {
         );
     };
 }
+
+export default assembly;

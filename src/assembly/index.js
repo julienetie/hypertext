@@ -1,4 +1,4 @@
-import assembly from './create-virtual-node';
+import assembly from './assembly';
 import loop from './loop';
 import or from './or';
 
